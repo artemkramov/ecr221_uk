@@ -1459,6 +1459,9 @@ var TableContainer = Backbone.View.extend({
 	showData:       function () {
 		this.showContent = false;
 		this.content.$el.show();
+	},
+	remove: function () {
+		this.content.remove();
 	}
 });
 
