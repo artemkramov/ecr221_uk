@@ -13,7 +13,8 @@ var AppRouter = Backbone.Router.extend({
 		"modem(/:page)":   'modemScr',
 		"fm(/:page)":      'fisc',
 		"logo":            'logoScr',
-		"report":          'repScr'
+		"report":          'repScr',
+		"backup":          'backupScr'
 	},
 	execute: function (callback, args) {
 		if (this.view) {
@@ -98,11 +99,13 @@ var AppRouter = Backbone.Router.extend({
 				break;
 		}
 		this.view = new PagesScreen({no: this.fiscTab, models: fiscalPages});
+	},
+	backupScr:  function (page) {
+		this.view = new BackupScreenView();
 	}
 });
 
 var appStart = function () {
-	modemState = new ModemStatus();
 	ecrStatus  = new ECRStatus();
 	gprsExists = false;
 	//var pluCell = new Backbone.Model({size:0});
@@ -148,7 +151,8 @@ var appStart = function () {
 				addView: new NetworkView({model: networkCell})
 			})
 		}),
-		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})})
+		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})}),
+		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})})
 	];
 	schema          = new Schema();
 	appRouter       = new AppRouter();
@@ -195,18 +199,7 @@ var appStart = function () {
 					})
 			}));
 		}
-		modemPages   = [
-			{lnk: '#modem/state', name: 'State', page: new ModemState({model: modemState})},
-			{
-				lnk: "#modem/settings", name: 'Settings', page: new TableContainer({
-				model:     schema.get('NSMEP'),
-				className: 'col-md-10',
-				tblMode:   false,
-				show:      true
-			})
-			},
-			{lnk: "#modem/docs", name: 'Documents', page: new ModemDocs()}
-		];
+		modemPages   = [];
 		fiscalPages  = [
 			{lnk: '#fm/fisc', name: 'Fiscalization', page: new FiscDo()},
 			{lnk: '#fm/time', name: 'Time', page: new FiscTime()},

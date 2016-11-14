@@ -120,32 +120,41 @@ var TableModel = Backbone.Model.extend({
     isNew: function() {return this.newModel;}
 });
 
-var TableCollection = Backbone.Collection.extend({
-    initialize:function(models, options) {
-        if (options && options.url) this.url = options.url;
+var TableCollection = Backbone.PageableCollection.extend({
+    state:      {
+        pageSize: 20,
+        sortKey:  "updated",
+        order:    1
     },
-    parse: function(resp/*,options*/) {
+    mode:       "client",
+    initialize: function (models, options) {
+        if (options && options.url) this.url = options.url;
+        if (options && !_.isUndefined(options.mode)) {
+            this.mode = options.mode;
+        }
+    },
+    parse:      function (resp/*,options*/) {
         var key = this.model.prototype.schema.get('key') || 'id';
         if (_.isArray(resp)) {
-            var toRemove=[];
-            _.each(resp,function(el){
-                if (! key in el) {
+            var toRemove = [];
+            _.each(resp, function (el) {
+                if (!key in el) {
                     toRemove.push(el);
                     if ('err' in el) {
                         var $this = this;
-                        schema.parseError(el.err,function(msg,field){
-                            $this.trigger('err',el, msg, field);
+                        schema.parseError(el.err, function (msg, field) {
+                            $this.trigger('err', el, msg, field);
                         });
                     }
                 }
             });
-            resp = _.difference(resp,toRemove);
+            resp         = _.difference(resp, toRemove);
         } else {
-            if (! key in resp) {
+            if (!key in resp) {
                 if ('err' in resp) {
                     var $this = this;
-                    schema.parseError(resp.err,function(msg,field){
-                        $this.trigger('err',el, msg, field);
+                    schema.parseError(resp.err, function (msg, field) {
+                        $this.trigger('err', el, msg, field);
                     });
                 }
                 return [];
@@ -153,101 +162,105 @@ var TableCollection = Backbone.Collection.extend({
         }
         return resp;
     },
-    syncSave: function(errorRep) {
-        var toSync = [];
-        var toAdd = [];
-        var cols = _.map(this.model.prototype.schema.get('elems'),function(el){
-            return (("editable" in el) && !el.editable)?0:el.name;
+    syncSave:   function (errorRep) {
+        var toSync   = [];
+        var toAdd    = [];
+        var cols     = _.map(this.model.prototype.schema.get('elems'), function (el) {
+            return (("editable" in el) && !el.editable) ? 0 : el.name;
         });
-        cols = _.compact(cols);
-        this.each(function(model) {
+        cols         = _.compact(cols);
+        this.each(function (model) {
             if (model.hasChanged() || model.isNew()) {
                 if (model.isNew()) {
                     var k = model.keys();
-                    var c = _.intersection(k,cols);
-                    if (c.length==cols.length) {
+                    var c = _.intersection(k, cols);
+                    if (c.length == cols.length) {
                         toAdd.push(model.attributes);
                         //model.newModel = false;
                     }
                 } else {
-                    var e = {};
-                    e[model.idAttribute]=model.id;
-                    e = _.extend(e,model.changedAttributes());
+                    var e                = {};
+                    e[model.idAttribute] = model.id;
+                    e                    = _.extend(e, model.changedAttributes());
                     toSync.push(e);
                 }
             }
-        },this);
+        }, this);
         var promises = [];
-        var key = this.model.prototype.schema.get('key') || 'id';
+        var key      = this.model.prototype.schema.get('key') || 'id';
         if (toSync.length) {
-            var err_id=null;
-            var err=false;
-            var sp = new $.Deferred();
-            this.sync('patch',this,{
-                attrs:toSync,
-                context:this,
-                success:function(resp){
-                    if (_.isObject(resp)&& _.isEmpty(resp) ) {
-                        _.each(toSync,function(el){
+            var err_id = null;
+            var err    = false;
+            var sp     = new $.Deferred();
+            this.sync('patch', this, {
+                attrs:   toSync,
+                context: this,
+                success: function (resp) {
+                    if (_.isObject(resp) && _.isEmpty(resp)) {
+                        _.each(toSync, function (el) {
                             var e = this.get(el[key]);
-                            e && e.set({},{silent:true});
-                        },this);
+                            e && e.set({}, {silent: true});
+                        }, this);
                     }
-                    this.on('err',function(model,msg,field){
-                        if (errorRep) {errorRep({msg:msg,fld:field,row:model.id})}
-                        err_id=model.id;
-                        err=true;
-                    },this);
-                    this.set(resp,{remove:false, parse:true, silent:true});
-                    this.off('err',null,this);
+                    this.on('err', function (model, msg, field) {
+                        if (errorRep) {
+                            errorRep({msg: msg, fld: field, row: model.id})
+                        }
+                        err_id = model.id;
+                        err    = true;
+                    }, this);
+                    this.set(resp, {remove: false, parse: true, silent: true});
+                    this.off('err', null, this);
                     if (err) {
-                        if (toSync.length>1 && err_id) {
-                            _.find(toSync,function(el){
-                                if (el[key]==err_id) return true;
+                        if (toSync.length > 1 && err_id) {
+                            _.find(toSync, function (el) {
+                                if (el[key] == err_id) return true;
                                 var e = this.get(el[key]);
-                                e && e.set({},{silent:true});
+                                e && e.set({}, {silent: true});
                                 return false;
                             });
                         }
                         sp.reject();
                     } else sp.resolve();
                 },
-                error:function(xhr/*,status,error*/) {
-                    if (errorRep) errorRep({msg:xhrError(xhr)});
+                error:   function (xhr/*,status,error*/) {
+                    if (errorRep) errorRep({msg: xhrError(xhr)});
                     sp.reject();
                 }
             });
             promises.push(sp);
         }
         if (toAdd.length) {
-            var err_ida=null;
-            var erra=false;
-            var ap = new $.Deferred();
-            this.sync('create',this,{
-                attrs:toAdd,
-                context:this,
-                success:function(resp){
-                    if (_.isObject(resp)&& _.isEmpty(resp) ) {
-                        _.each(toAdd,function(el){
+            var err_ida = null;
+            var erra    = false;
+            var ap      = new $.Deferred();
+            this.sync('create', this, {
+                attrs:   toAdd,
+                context: this,
+                success: function (resp) {
+                    if (_.isObject(resp) && _.isEmpty(resp)) {
+                        _.each(toAdd, function (el) {
                             var e = this.get(el[key]);
                             if (e) {
-                                e.set({},{silent:true});
+                                e.set({}, {silent: true});
                                 delete e.newModel;
                             }
-                        },this);
+                        }, this);
                     } else {
-                        this.on('err',function(model,msg,field){
-                            if (errorRep) {errorRep({msg:msg,fld:field,row:model.id})}
-                            err_ida=model.id;
-                            erra=true;
-                        },this);
-                        this.set(resp,{remove:false, parse:true, silent:true});
-                        this.off('err',null,this);
+                        this.on('err', function (model, msg, field) {
+                            if (errorRep) {
+                                errorRep({msg: msg, fld: field, row: model.id})
+                            }
+                            err_ida = model.id;
+                            erra    = true;
+                        }, this);
+                        this.set(resp, {remove: false, parse: true, silent: true});
+                        this.off('err', null, this);
                     }
                     if (erra) {
-                        if (toAdd.length>1 && err_id) {
-                            _.find(toAdd,function(el){
-                                if (el[key]==err_ida) return true;
+                        if (toAdd.length > 1 && err_id) {
+                            _.find(toAdd, function (el) {
+                                if (el[key] == err_ida) return true;
                                 var e = this.get(el[key]);
                                 if (e) {
                                     e.set({}, {silent: true});
@@ -259,17 +272,177 @@ var TableCollection = Backbone.Collection.extend({
                         ap.reject();
                     } else ap.resolve();
                 },
-                error:function(xhr/*,status,error*/) {
-                    if (errorRep) errorRep({msg:xhrError(xhr)});
+                error:   function (xhr/*,status,error*/) {
+                    if (errorRep) errorRep({msg: xhrError(xhr)});
                     ap.reject();
                 }
             });
             promises.push(ap);
         }
-        return (promises.length==0)?false:$.when.apply($, promises);
+        return (promises.length == 0) ? false : $.when.apply($, promises);
     },
-    deleteRows: function(models) {_.each(models,function(m){ m.destroy({wait:true});});},
-    newRow: function() {this.unshift({}).newModel=true;}
+    deleteRows: function (models) {
+        _.each(models, function (m) {
+            m.destroy({wait: true});
+        });
+    },
+    newRow:     function () {
+        this.unshift({}).newModel = true;
+    },
+    syncSaveSynchronize: function (errorRep) {
+        var toSync   = [];
+        var toAdd    = [];
+        var cols     = _.map(this.model.prototype.schema.get('elems'), function (el) {
+            return (("editable" in el) && !el.editable) ? 0 : el.name;
+        });
+        cols         = _.compact(cols);
+        this.each(function (model) {
+            if (model.hasChanged() || model.isNew()) {
+                if (model.isNew()) {
+                    var k = model.keys();
+                    var c = _.intersection(k, cols);
+                    if (c.length == cols.length) {
+                        toAdd.push(model.attributes);
+                        //model.newModel = false;
+                    }
+                } else {
+                    var e                = {};
+                    e[model.idAttribute] = model.id;
+                    e                    = _.extend(e, model.changedAttributes());
+                    toSync.push(e);
+                }
+            }
+        }, this);
+        var self     = this;
+        var deferred = $.Deferred();
+        var key      = this.model.prototype.schema.get('key') || 'id';
+        this.syncEditModels(toSync, errorRep, key).done(function () {
+            self.syncCreateModels(toAdd, errorRep, key).done(function () {
+                return deferred.resolve();
+            }).fail(function (response) {
+                return deferred.reject(response);
+            });
+        }).fail(function (response) {
+            return deferred.reject(response);
+        });
+        return deferred.promise();
+    },
+    syncEditModels:      function (toSync, errorRep, key) {
+        var deferred = $.Deferred();
+        if (!_.isEmpty(toSync)) {
+            var err_id = null;
+            var err    = false;
+            this.sync('patch', this, {
+                attrs:   toSync,
+                context: this,
+                success: function (resp) {
+                    var responseReturn = _.clone(resp);
+                    responseReturn.key = key;
+                    if (_.isObject(resp) && _.isEmpty(resp)) {
+                        _.each(toSync, function (el) {
+                            var e = this.get(el[key]);
+                            e && e.set({}, {silent: true});
+                        }, this);
+                    }
+                    else {
+                        if (!_.isUndefined(resp['err'])) {
+                            err = true;
+                        }
+                    }
+                    this.on('err', function (model, msg, field) {
+                        if (errorRep) {
+                            errorRep({msg: msg, fld: field, row: model.id})
+                        }
+                        err_id = model.id;
+                        err    = true;
+                    }, this);
+                    this.set(resp, {remove: false, parse: true, silent: true});
+                    this.off('err', null, this);
+                    if (err) {
+                        if (toSync.length > 1 && err_id) {
+                            _.find(toSync, function (el) {
+                                if (el[key] == err_id) return true;
+                                var e = this.get(el[key]);
+                                e && e.set({}, {silent: true});
+                                return false;
+                            });
+                        }
+                        deferred.reject(responseReturn);
+                    } else deferred.resolve();
+                },
+                error:   function (xhr/*,status,error*/) {
+                    if (errorRep) errorRep({msg: xhrError(xhr)});
+                    deferred.reject();
+                }
+            });
+        }
+        else {
+            return deferred.resolve();
+        }
+        return deferred.promise();
+    },
+    syncCreateModels:    function (toAdd, errorRep, key) {
+        var deferred = $.Deferred();
+        if (!_.isEmpty(toAdd)) {
+            var err_ida = null;
+            var erra    = false;
+            this.sync('create', this, {
+                attrs:   toAdd,
+                context: this,
+                success: function (resp) {
+                    var responseReturn = _.clone(resp);
+                    responseReturn.key = key;
+                    if (_.isObject(resp) && _.isEmpty(resp)) {
+                        _.each(toAdd, function (el) {
+                            var e = this.get(el[key]);
+                            if (e) {
+                                e.set({}, {silent: true});
+                                delete e.newModel;
+                            }
+                        }, this);
+                    } else {
+                        if ("err" in resp) {
+                            erra = true;
+                        }
+                        this.on('err', function (model, msg, field) {
+                            if (errorRep) {
+                                errorRep({msg: msg, fld: field, row: model.id})
+                            }
+                            err_ida = model.id;
+                            erra    = true;
+                        }, this);
+                        this.set(resp, {remove: false, parse: true, silent: true});
+                        this.off('err', null, this);
+                    }
+                    if (erra) {
+                        if (toAdd.length > 1 && err_ida) {
+                            _.find(toAdd, function (el) {
+                                if (el[key] == err_ida) return true;
+                                var e = this.get(el[key]);
+                                if (e) {
+                                    e.set({}, {silent: true});
+                                    delete e.newModel;
+                                }
+                                return false;
+                            });
+                        }
+                        deferred.reject(responseReturn);
+
+                    } else {
+                        deferred.resolve();
+                    }
+                },
+                error:   function (xhr/*,status,error*/) {
+                    if (errorRep) errorRep({msg: xhrError(xhr)});
+                    deferred.reject();
+                }
+            });
+        }
+        else {
+            return deferred.resolve();
+        }
+        return deferred.promise();
+    }
 });
 
 var NetworkInfo = Backbone.Collection.extend({

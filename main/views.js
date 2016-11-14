@@ -135,6 +135,52 @@ var Modal = Backbone.View.extend({
 	}
 });
 
+var ConfirmModal = Modal.extend({
+
+	callbackConfirm: function () {
+	},
+
+	autoClose: false,
+
+	setCallback:  function (callback) {
+		this.callbackConfirm = callback;
+		this.setButtons(this.buttons());
+	},
+	buttons:      function () {
+		return {
+			confirm: [t('yes'), 'primary'],
+			cancel:  [t('None'), 'danger']
+		};
+	},
+	click:        function (ev) {
+		var buttonType = 'handle-' + $(ev.target).data('ev').toString();
+		buttonType     = toCamelCase(buttonType);
+		if (!_.isUndefined(this[buttonType]) && _.isFunction(this[buttonType])) {
+			this[buttonType]();
+			this.setButtons({});
+		}
+	},
+	cancel:     function () {
+		this.$el.off('click', '.modal-footer button');
+		events.trigger('clickDlg', 'hide');
+	},
+	handleCancel: function () {
+		this.$el.off('click', '.modal-footer button');
+		this.hide();
+	},
+	handleConfirm: function() {
+		if (_.isFunction(this.callbackConfirm)) {
+			if (this.autoClose) {
+				this.hide();
+			}
+			$('body').removeClass('modal-open');
+			this.callbackConfirm();
+			this.$el.off('click', '.modal-footer button');
+		}
+	}
+
+});
+
 // </editor-fold>
 
 // <editor-fold desc="----------------------Main Screen Views--------------------------">
@@ -143,7 +189,7 @@ var LanguageSelector = Backbone.View.extend({
 	tagName:   'select',
 	className: 'pull-right',
 	events:    {
-		'click': 'langChg'
+		'change': 'langChg'
 	},
 	render:    function () {
 		_.each(schema.langs, function (value) {
@@ -157,7 +203,7 @@ var LanguageSelector = Backbone.View.extend({
 		schema.switchLang(this.$el.val());
 		this.$el.val(schema.lang);
 		appRouter.navigate("", {trigger: true, replace: true});
-		//console.log('lang',this.$el.val());
+		Backbone.history.loadUrl(Backbone.history.fragment);
 		return false;
 	}
 });
@@ -822,7 +868,39 @@ var TableDisplay = Backgrid.Grid.extend({
 					break;
 			}
 		}
-	}
+	},
+	render:     function () {
+		var self       = this;
+		var view       = Backgrid.Grid.prototype.render.apply(this);
+		var paginator  = new Backgrid.Extension.Paginator({
+			collection:              self.collection,
+			renderMultiplePagesOnly: true
+		});
+		var fieldCount = self.model.get('elems').length;
+		/**
+		 * Check if the table is PLU then include the column with checkboxes
+		 */
+		if (self.model.get("id") == "PLU") {
+			fieldCount++;
+		}
+		var pagination = paginator.render().$el;
+		/**
+		 * Check if the pagination isn't empty
+		 */
+		if (pagination.find('ul').length) {
+			/**
+			 * Create tfoot element and append to the table
+			 * @type {*|jQuery|HTMLElement}
+			 */
+			var tfoot = $("<tfoot />");
+			var tr    = $("<tr />");
+			var td    = $("<td />").attr('colspan', fieldCount.toString()).addClass('backgrid-pagination-cell').append(pagination);
+			tr.append(td);
+			tfoot.append(tr);
+			view.$el.find("thead").after(tfoot);
+		}
+		return view;
+	},
 });
 
 var PLUTableDisplay = TableDisplay.extend({
@@ -1363,7 +1441,18 @@ var TableContainer = Backbone.View.extend({
 		} else {
 			var $this = this;
 			$.when(schema.tableFetch(this.model.get('id'))).done(function () {
-				$this.$el.append($this.content.render().$el)
+				/**
+				 * Find the primary key of the model
+				 */
+				var key = $this.model.get('key');
+				if (_.isUndefined(key)) {
+					key = 'id';
+				}
+				var view = $this.content.render();
+				if (_.isFunction(view.sort)) {
+					view = view.sort(key, "ascending");
+				}
+				$this.$el.append(view.$el)
 			});
 		}
 	},

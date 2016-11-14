@@ -283,11 +283,20 @@ var FiscDo = PageView.extend({
 		this.$el.append(this.taxes.render().$el);
 		this.$el.append(this.fsk.render().$el);
 		var tmpl = "<button type='button' id='%s' class='btn btn-%s' data-loading-text='%s'>%s</button>\n";
-		this.$el.append(_.reduce([
-				['hd', 'default', t('Wait...'), t('Save Headers')],
-				['tx', 'default', t('Wait...'), t('Save Taxes')],
-				['fsc', 'primary', t('Wait...'), t('Fiscalize')]],
-			function (memo, el) {
+		/**
+		 * The buttons on the bottom of the page
+		 * @type {*[]}
+		 */
+		var buttonsBottom = [['fsc', 'primary', t('Wait...'), t('Fiscalize')]];
+		/**
+		 * If the device is fiscalized then remove "Fiscalize" button
+		 * Else remove two other buttons
+		 */
+		if (fiscalCell.get("fiscalize")) {
+			buttonsBottom = [['hd', 'default', t('Wait...'), t('Reregistration')],
+				['tx', 'default', t('Wait...'), t('Change Tax Rates')]];
+		}
+		this.$el.append(_.reduce(buttonsBottom, function (memo, el) {
 				el[2] = t(el[2]);
 				return memo + vsprintf(tmpl, el);
 			}, ""
@@ -299,39 +308,48 @@ var FiscDo = PageView.extend({
 		var currDate = new Date();
 		ecrDate.setHours(0, 0, 0, 0);
 		currDate.setHours(0, 0, 0, 0);
-		if (ecrDate.valueOf() == currDate.valueOf()) {
-			proc(e);
-			return;
-		}
-		var modal = new Modal();
-		modal.set({
-			header: t('Date Warning!!!'),
-			body:   sprintf(t('<p>This operation will create fiscal record with date <b>%s</b></p>') +
-				t('<p>So, ECR can not be used until this date. </p>') +
-				t('<p>Are you sure to continue?</p>'), toStringDate(ecrDate))
-		});
-		modal.show();
-		modal.waitClick({
-			next:   ['Continue', 'danger'],
-			cancel: 'Close'
-		}).always(function (btn) {
-			if (btn == 'next') proc(e);
-			modal.hide();
-		});
+		proc(e);
 	},
 	saveHdr:    function (e) {
 		e.preventDefault();
-		this.checkTime(this.doHdr, e);
+		var self         = this;
+		var confirmModal = new ConfirmModal();
+		confirmModal.set({
+			header: t('Warning'),
+			body:   t('Are you you want to perform this operation?')
+		});
+		confirmModal.setCallback(function () {
+			self.checkTime(self.doHdr, e);
+		});
+		confirmModal.show();
 		return false;
 	},
 	saveTax:    function (e) {
 		e.preventDefault();
-		this.checkTime(this.doTax, e);
+		var self         = this;
+		var confirmModal = new ConfirmModal();
+		confirmModal.set({
+			header: t('Warning'),
+			body:   t('Are you you want to perform this operation?')
+		});
+		confirmModal.setCallback(function () {
+			self.checkTime(self.doTax, e);
+		});
+		confirmModal.show();
 		return false;
 	},
 	fiscalize:  function (e) {
 		e.preventDefault();
-		this.checkTime(this.doFisc, e);
+		var self         = this;
+		var confirmModal = new ConfirmModal();
+		confirmModal.set({
+			header: t('Warning'),
+			body:   t('Are you you want to perform this operation?')
+		});
+		confirmModal.setCallback(function () {
+			self.checkTime(self.doFisc, e);
+		});
+		confirmModal.show();
 		return false;
 	},
 	doHdr:      function (e) {
@@ -345,6 +363,21 @@ var FiscDo = PageView.extend({
 	doFisc:     function (e) {
 		callProc({addr: '/cgi/proc/fiscalization', btn: e.target/*'#fsc'*/});
 		//console.log('Fiscalize');
+	}
+});
+
+/**
+ * Alert for the pushing of messages
+ * Uses bootstrap alerts
+ */
+var Alert = Backbone.View.extend({
+	template: _.template($("#alert-block").html()),
+	render:   function () {
+		this.$el.html(this.template({
+			type:    this.model.type,
+			message: this.model.message
+		}));
+		return this;
 	}
 });
 

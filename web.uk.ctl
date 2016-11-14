@@ -62,6 +62,10 @@ Name=css/bootstrap-theme.css
 File=css/bootstrap-theme.min.css
 Content-Type=text/css
 
+Name=css/backgrid-paginator.min.css
+File=css/backgrid-paginator.min.css
+Content-Type=text/css
+
 Name=css/main.css
 File=css/main.css
 Content-Type=text/css
@@ -84,6 +88,10 @@ Name=js/underscore.js
 File=js/underscore-min.js
 Content-Type=application/javascript
 
+Name=js/papaparse.min.js
+File=js/papaparse.min.js
+Content-Type=application/javascript
+
 Name=js/jquery.js
 File=js/jquery-2.1.1.min.js
 Content-Type=application/javascript
@@ -98,6 +106,26 @@ Content-Type=application/javascript
 
 Name=js/sprintf.js
 File=js/sprintf.js
+Content-Type=application/javascript
+
+Name=js/backgrid-paginator.min.js
+File=js/backgrid-paginator.min.js
+Content-Type=application/javascript
+
+Name=js/backbone-pageable.min.js
+File=js/backbone-pageable.min.js
+Content-Type=application/javascript
+
+Name=js/backup.js
+File=main/backup.js;
+Content-Type=application/javascript
+
+Name=js/FileSaver.min.js
+File=js/FileSaver.min.js
+Content-Type=application/javascript
+
+Name=js/jszip.min.js
+File=js/jszip.min.js
 Content-Type=application/javascript
 
 #image files
@@ -116,6 +144,10 @@ Content-Type=image/png
 
 Name=img/plu-h.png
 File=img/plu-h.png
+Content-Type=image/png
+
+Name=img/backup-h.png
+File=img/backup-h.png
 Content-Type=image/png
 
 Name=img/network-h.png
