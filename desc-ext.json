@@ -119,8 +119,9 @@
       "B&W": "Ч.Б.",
       "Wait...": "Ждите...",
       "Day report": "Дневной отчет",
-      "X-Report": "Без обнуления",
-      "Z-Report": "С обнулением",
+      "X report": "X отчет",
+      "Z report": "Z отчет",
+      "Fiscal memory report": "Отчеты фискальной памяти",
       "Print": "Печать",
       "Reports": "Отчеты",
       "Fiscal reports": "Фискальные отчеты",
@@ -141,7 +142,15 @@
       "Backup file name": "Имя файла для экспорта",
       "Name": "Название",
       "Description": "Описание",
-      "Error": "Ошибка"
+      "Error": "Ошибка",
+      "Print KSEF": "Печать КЛЕФ",
+      "Report number": "Номер отчета",
+      "Start check number": "Начальный номер чека",
+      "End check number": "Конечный номер чека",
+      "All check range": "Весь диапазон чеков",
+      "Report copy": "Копия отчета",
+      "Consumption checks": "Расходные чеки",
+      "Checks for": "Чеки продаж"
     }
   },
   "uk": {
@@ -264,8 +273,9 @@
       "B&W": "Ч.Б.",
       "Wait...": "Чекайте...",
       "Day report": "Денний звіт",
-      "X-Report": "Без обнулення",
-      "Z-Report": "З обнуленням",
+      "X report": "X звіт",
+      "Z report": "Z звіт",
+      "Fiscal memory report": "Звіти фіскальної пам'яті",
       "Print": "Друк",
       "Reports": "Звіти",
       "Fiscal reports": "Фіскальні звіти",
@@ -286,7 +296,15 @@
       "Backup file name": "Ім'я файлу для експорту",
       "Name": "Назва",
       "Description": "Опис",
-      "Error": "Помилка"
+      "Error": "Помилка",
+      "Print KSEF": "Друк КСЕФ",
+      "Report number": "Номер звіту",
+      "Start check number": "Початковий номер чеку",
+      "End check number": "Кінцевий номер чеку",
+      "All check range": "Весь діапазон чеків",
+      "Report copy": "Копія звіту",
+      "Consumption checks": "Видаткові чеки",
+      "Checks for": "Чеки продаж"
     }
   }
 }

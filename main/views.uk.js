@@ -451,11 +451,27 @@ var ReportPage = Backbone.View.extend({
 		'click #xr': 'xrep',
 		'click #zr': 'zrep',
 		'click #pN': 'prnNum',
-		'click #pD': 'prnDate'
+		'click #pD': 'prnDate',
+		'click [name="radio-option"]': 'onOptionClick',
+		'submit #form-print-ksef': 'printKSEF'
 	},
 	template: _.template($('#reports-tmpl').html()),
 	render:   function () {
-		this.$el.html(this.template());
+		var self = this;
+		$.ajax({
+			url: "/cgi/tbl/FDay",
+			dataType: 'json',
+			async: false,
+			success: function (response) {
+				var maximumNumber = 0;
+				if (_.isArray(response) && !_.isEmpty(response)) {
+					maximumNumber = response.length;
+				}
+				self.$el.html(self.template({
+					maximumNumber: maximumNumber
+				}));
+			}
+		});
 		return this;
 	},
 	xrep:     function (e) {
@@ -482,6 +498,47 @@ var ReportPage = Backbone.View.extend({
 			addr: '/cgi/proc/printfmreport',
 			btn:  e.target
 		}, $('#isShort').prop('checked') ? 3 : 1, toStringDate(getDate('fromD'), 'y-m-d'), toStringDate(getDate('toD'), 'y-m-d'), 1, 1);
+		return false;
+	},
+	onOptionClick: function (e) {
+		var currentOptionValue = $(e.target).val();
+		var inputCheckNumber = this.$el.find(".check-number");
+		switch (parseInt(currentOptionValue)) {
+			case 1:
+			case 2:
+				$(inputCheckNumber).attr('disabled', true);
+				break;
+			default:
+				$(inputCheckNumber).removeAttr('disabled');
+				break;
+		}
+	},
+	printKSEF: function (e) {
+		e.preventDefault();
+		var fromNumber = parseInt($("#from-number").val());
+		var toNumber = parseInt($("#to-number").val());
+		var number = $("#report-number").val();
+		var selectedOption = $("input[name='radio-option']:checked").val();
+		switch (parseInt(selectedOption)) {
+			case 1:
+				fromNumber = toNumber = 65535;
+				break;
+			case 2:
+				fromNumber = toNumber = 0;
+				break;
+			case 3:
+				var coefficient = 32768;
+				fromNumber += coefficient;
+				toNumber += coefficient;
+				break;
+			default:
+				break;
+		}
+		var btn = this.$el.find('#btn-print-ksef');
+		callProc({
+			addr: '/cgi/proc/printmmcjrn',
+			btn: btn
+		}, number, fromNumber, toNumber);
 		return false;
 	}
 });
