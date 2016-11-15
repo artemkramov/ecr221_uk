@@ -48,7 +48,7 @@ var ECRStatus = Backbone.Model.extend({
 });
 
 var FiscalCell = Backbone.Model.extend({
-    initialize: function(){
+    initialize: function()  {
         var $this = this;
         $.getJSON("/cgi/tbl/FDay?s=1&e=2",function(data){
             if (_.isArray(data)) data = data[0];
@@ -59,7 +59,32 @@ var FiscalCell = Backbone.Model.extend({
                     $this.set('firstTime',new Date(data.Date*1000));
                 } else { $this.unset('firstTime');}
             }
-            $this.set('fiscalize',$this.has('firstRep'));
+            //$this.set('fiscalize',$this.has('firstRep'));
+        });
+        $.getJSON("/cgi/state", function (response) {
+            /**
+             * If the response has a field fiscalization
+             * than set it as fiscalization
+             */
+            if (!_.isUndefined(response["Fiscalization"])) {
+                $this.set("fiscalize", response["Fiscalization"]);
+            }
+            else {
+                /**
+                 * Load data from FTax and FSbr
+                 * If both tables are empty - not fiscalized
+                 * Else - fiscalized
+                 */
+                $this.loadFiscalizationData().then(function () {
+                    var isFiscalized = false;
+                    _.each(arguments, function (response) {
+                        if (_.isArray(response) && response[1] == 'success' && _.isObject(response[0]) && !_.isEmpty(response[0])) {
+                            isFiscalized = true;
+                        }
+                    });
+                    $this.set("fiscalize", isFiscalized);
+                });
+            }
         });
         $.getJSON("/cgi/tbl/FDay?s=-1",function(data,status){
             if (_.isArray(data)) data = data[0];
@@ -73,6 +98,18 @@ var FiscalCell = Backbone.Model.extend({
                 } else $this.unset('lastTime');
             }
         });
+    },
+    loadFiscalizationData: function () {
+        var promises = [];
+        promises.push($.ajax({
+            url: '/cgi/tbl/FTax',
+            dataType: 'json'
+        }));
+        promises.push($.ajax({
+            url: '/cgi/tbl/FSbr',
+            dataType: 'json'
+        }));
+        return $.when.apply($, promises);
     }
 });
 
