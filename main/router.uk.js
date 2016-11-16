@@ -107,6 +107,7 @@ var AppRouter = Backbone.Router.extend({
 
 var appStart = function () {
 	ecrStatus  = new ECRStatus();
+	modemState = new ModemStatus();
 	gprsExists = false;
 	//var pluCell = new Backbone.Model({size:0});
 	fiscalCell  = new FiscalCell({
@@ -151,6 +152,7 @@ var appStart = function () {
 				addView: new NetworkView({model: networkCell})
 			})
 		}),
+		new MainCell({model:new Backbone.Model({lnk:'#modem',img:'modem',name:'Modem'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})})
 	];
@@ -199,7 +201,16 @@ var appStart = function () {
 					})
 			}));
 		}
-		modemPages   = [];
+		modemPages   = [
+			{lnk:'#modem/state',name:'State',page:new ModemState({model:modemState})},
+			{lnk:"#modem/settings",name:'Settings',page:new TableContainer({
+				model: schema.get('NSMEP'),
+				className:'col-md-10',
+				tblMode:false,
+				show:true
+			})},
+			{lnk:"#modem/docs",name:'Documents',page:new ModemDocs()}
+		];
 		fiscalPages  = [
 			{lnk: '#fm/fisc', name: 'Fiscalization', page: new FiscDo()},
 			{lnk: '#fm/time', name: 'Time', page: new FiscTime()},

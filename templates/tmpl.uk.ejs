@@ -1,5 +1,50 @@
 <script type="text/template" id="modem-state">
+    <table class="table table-striped">
+        <caption><h2><%= t('Modem') %></h2></caption>
+        <tr>
+            <td><%= t('Personalized with ID_SAM') %></td>
+            <td><%= decHexStr(pers_sam_id) %></td>
+        </tr>
+        <tr>
+            <td><%= t('Modem state') %></td>
+            <td><%= modemStateDecode(dev_state) %></td>
+        </tr>
+        <tr>
+            <td><%= t('Connection period') %></td>
+            <td><%= afterTime(tmo) %></td>
+        </tr>
+        <tr>
+            <td><%= t('Connect after') %></td>
+            <td><%= afterTime(ct) %></td>
+        </tr>
+        <tr>
+            <td><%= t('Block after') %></td>
+            <td><%= afterTime(bt) %></td>
+        </tr>
+    </table>
 
+    <button class="btn btn-default" id="do_conn"><%= t('Exchange') %></button>
+    <button class="btn btn-info" id="do_log"><%= t('Log') %></button>
+
+    <table class="table table-striped">
+        <caption><h2><%= t('SAM') %></h2></caption>
+        <tr>
+            <td><%= t('Card#') %></td>
+            <td><%= card_no %></td>
+        </tr>
+        <tr>
+            <td><%= t('ID_SAM') %></td>
+            <td><%= decHexStr(sam_id) %></td>
+        </tr>
+        <tr>
+            <td><%= t('Acquirer ID') %></td>
+            <td><%= eq_id %></td>
+        </tr>
+        <tr>
+            <td><%= t('Paired with ID_DEV') %></td>
+            <td><%= decHexStr(sam_dev_id) %></td>
+        </tr>
+    </table>
 </script>
 
 <script type="text/template" id="modem-docs">
@@ -163,16 +208,19 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <div class="radio">
-                                <label><input type="radio" name="radio-option" value="1"><%= t("All check range") %></label>
+                                <label><input type="radio" name="radio-option" value="1"><%= t("All check range") %>
+                                </label>
                             </div>
                             <div class="radio">
                                 <label><input type="radio" name="radio-option" value="2"><%= t("Report copy") %></label>
                             </div>
                             <div class="radio">
-                                <label><input type="radio" name="radio-option" value="3"><%= t("Consumption checks") %></label>
+                                <label><input type="radio" name="radio-option" value="3"><%= t("Consumption checks") %>
+                                </label>
                             </div>
                             <div class="radio">
-                                <label><input type="radio" name="radio-option" value="4" checked><%= t("Checks for") %></label>
+                                <label><input type="radio" name="radio-option" value="4" checked><%= t("Checks for") %>
+                                </label>
                             </div>
                         </div>
                     </div>
