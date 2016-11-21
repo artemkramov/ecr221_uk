@@ -44,3 +44,6 @@ a img:active {-webkit-transform: scale(1);transform: scale(1);}
 .backgrid-pagination-cell {
     display: table-cell !important;
 }
+.backup-delimiter {
+    max-width: 60px;
+}

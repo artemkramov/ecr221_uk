@@ -96,10 +96,11 @@ var ExportView = BackupSubView.extend({
 	 * All events related to this view
 	 */
 	events: {
-		"click .btn-export":      "onButtonExportClick",
-		"click .toggle-all":      "onToggleClick",
-		"click .btn-run-export":  "onButtonRunExportClick",
-		"keyup #export-filename": "onFilenameChange"
+		"click .btn-export":       "onButtonExportClick",
+		"click .toggle-all":       "onToggleClick",
+		"click .btn-run-export":   "onButtonRunExportClick",
+		"keyup #export-filename":  "onFilenameChange",
+		"keyup #export-delimiter": "onDelimiterChange"
 	},
 
 	/**
@@ -111,6 +112,11 @@ var ExportView = BackupSubView.extend({
 	 * Default zip archive filename
 	 */
 	backupFilename: "",
+
+	/**
+	 * Default export delimiter
+	 */
+	backupDelimiter: ";",
 
 	/**
 	 * Path for the logo upload
@@ -126,8 +132,9 @@ var ExportView = BackupSubView.extend({
 		this.delegateEvents();
 		this.$el.empty();
 		this.$el.append(this.template({
-			backupList: self.backupList,
-			filename:   self.backupFilename
+			backupList:      self.backupList,
+			filename:        self.backupFilename,
+			exportDelimiter: self.backupDelimiter
 		}));
 		return this;
 	},
@@ -162,6 +169,9 @@ var ExportView = BackupSubView.extend({
 		if (!_.isEmpty(models)) {
 			this.clearMessageBlock();
 			ExportModel.isReturn = true;
+			if (!_.isEmpty(self.backupDelimiter)) {
+				ExportModel.exportDelimiter = self.backupDelimiter;
+			}
 			ExportModel.run(models).done(function (zip) {
 				self.exportLogo().done(function (response) {
 					zip.file("logo.bmp", response, {binary: true});
@@ -203,11 +213,18 @@ var ExportView = BackupSubView.extend({
 		return deferred.promise();
 	},
 	/**
-	 * Update the current backup file name
+	 * Update the current backup filename
 	 * @param e
 	 */
 	onFilenameChange:       function (e) {
 		this.backupFilename = $(e.target).val();
+	},
+	/**
+	 * Update the current delimiter
+	 * @param e
+	 */
+	onDelimiterChange:      function (e) {
+		this.backupDelimiter = $(e.target).val();
 	}
 });
 
@@ -267,21 +284,30 @@ var ImportView = BackupSubView.extend({
 	importModel: false,
 
 	/**
+	 * Default import delimiter
+	 */
+	backupDelimiter: ";",
+
+	/**
 	 * Describe events
 	 */
 	events:               {
-		"change #file-import":   "onFileChange",
-		"click #file-import":    "onFileClick",
-		"click .toggle-all":     "onToggleClick",
-		"click .btn-import-run": "onImportRunClick"
+		"change #file-import":     "onFileChange",
+		"click #file-import":      "onFileClick",
+		"click .toggle-all":       "onToggleClick",
+		"click .btn-import-run":   "onImportRunClick",
+		"keyup #import-delimiter": "onDelimiterChange"
 	},
 	/**
 	 * Render content
 	 * @returns {ImportView}
 	 */
 	render:               function () {
+		var self = this;
 		this.delegateEvents();
-		this.$el.empty().append(this.template());
+		this.$el.empty().append(this.template({
+			importDelimiter: self.backupDelimiter
+		}));
 		return this;
 	},
 	/**
@@ -464,6 +490,9 @@ var ImportView = BackupSubView.extend({
 		}
 		else {
 			ImportModel.initModel();
+			if (!_.isEmpty(self.backupDelimiter)) {
+				ImportModel.importDelimiter = self.backupDelimiter;
+			}
 			var files = [];
 			_.each(self.parsedFiles, function (fileData) {
 				if (_.indexOf(self.files, fileData.file.name) > -1) {
@@ -672,6 +701,13 @@ var ImportView = BackupSubView.extend({
 	pushDataToHistory:    function (modelData) {
 		ImportModel.history.push(modelData);
 	},
+	/**
+	 * Update the current delimiter
+	 * @param e
+	 */
+	onDelimiterChange:      function (e) {
+		this.backupDelimiter = $(e.target).val();
+	}
 
 });
 

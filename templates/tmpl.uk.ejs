@@ -45,6 +45,13 @@
             <td><%= decHexStr(sam_dev_id) %></td>
         </tr>
     </table>
+
+    <button class="btn btn-default" id="sam_switch">
+        <% print(t((card_no == '-') ? 'On' : 'Off')) %>
+    </button>
+    <button class="btn btn-primary" id="sam_wr"><%= t('SAM personalization') %></button>
+    <button class="btn btn-primary" id="pers_do"><%= t('Personalization') %></button>
+
 </script>
 
 <script type="text/template" id="modem-docs">

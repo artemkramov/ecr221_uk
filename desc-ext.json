@@ -150,7 +150,8 @@
       "All check range": "Весь диапазон чеков",
       "Report copy": "Копия отчета",
       "Consumption checks": "Расходные чеки",
-      "Checks for": "Чеки продаж"
+      "Checks for": "Чеки продаж",
+      "Delimiter": "Разделитель"
     }
   },
   "uk": {
@@ -304,7 +305,8 @@
       "All check range": "Весь діапазон чеків",
       "Report copy": "Копія звіту",
       "Consumption checks": "Видаткові чеки",
-      "Checks for": "Чеки продаж"
+      "Checks for": "Чеки продаж",
+      "Delimiter": "Роздільник"
     }
   }
 }

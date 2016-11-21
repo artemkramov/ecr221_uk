@@ -11,7 +11,7 @@
     </tr>
     <tr>
         <th><%= t('Last report') %>:</th>
-        <td><%= [lastRep,t('on'),dateStr(lastTime, 'd')].join(' ') %></td>
+        <td><%= [lastRep, t('on'), dateStr(lastTime, 'd')].join(' ') %></td>
     </tr>
     <% } else { %>
     <tr>
@@ -74,7 +74,7 @@
 <script type="text/template" id="left-col">
     <ul class="nav nav-pills nav-stacked">
         <% _.each(models,function(model, idx) { %>
-        <li <%= (idx == modelIdx)?'class="active"':'' %>><a href="<%= model.lnk %>"><%= t(model.name) %></a></li>
+        <li <%= (idx == modelIdx) ? 'class="active"' : '' %>><a href="<%= model.lnk %>"><%= t(model.name) %></a></li>
         <% }); %>
         <li><a href="#"><%= t('Back') %></a></li>
     </ul>
@@ -334,9 +334,9 @@
         <h4 class="list-group-item-heading"><%= d.msg %></h4>
 
         <p class="list-group-item-text">
-            <%= d.file?"<b>File:</b>" + d.file:"" %>
-            <%= d.tbl?"<b>Table:</b>" + d.tbl:"" %>
-            <%= d.row?"<b>Index:</b>" + d.row:"" %>
+            <%= d.file ? "<b>File:</b>" + d.file : "" %>
+            <%= d.tbl ? "<b>Table:</b>" + d.tbl : "" %>
+            <%= d.row ? "<b>Index:</b>" + d.row : "" %>
         </p>
     </li>
 </script>
@@ -387,6 +387,10 @@
                 <button type="button" class="btn btn-danger btn-run-export" disabled="true">
                     <%= t("Run") %>
                 </button>
+            </div>
+            <div class="form-group">
+                <label><%= t("Delimiter") %></label>
+                <input type="text" class="form-control backup-delimiter" maxlength="1" id="export-delimiter" value="<%= exportDelimiter %>"/>
             </div>
             <div class="form-group">
                 <label><%= t("Backup file name") %></label>
@@ -441,6 +445,10 @@
         <div class="panel-body">
             <label><%= t("Choose an archive to import") %></label>
             <input type="file" accept=".zip" id="file-import">
+            <div class="form-group">
+                <label><%= t("Delimiter") %></label>
+                <input type="text" class="form-control backup-delimiter" maxlength="1" id="import-delimiter" value="<%= importDelimiter %>"/>
+            </div>
             <button type="button" class="btn btn-danger btn-import-run" disabled="true">
                 <%= t("Import") %>
             </button>
