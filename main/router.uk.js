@@ -111,11 +111,12 @@ var appStart = function () {
 	gprsExists = false;
 	//var pluCell = new Backbone.Model({size:0});
 	fiscalCell  = new FiscalCell({
-		firstRep:  1,
-		firstTime: new Date(2000, 1, 1),
-		fiscalize: true,
-		lastRep:   5000,
-		lastTime:  new Date()
+		firstRep:     1,
+		firstTime:    new Date(2000, 1, 1),
+		fiscalize:    true,
+		lastRep:      5000,
+		lastTime:     new Date(),
+		isFiscalMode: false
 	});
 	networkCell = new NetworkInfo();
 
@@ -152,7 +153,7 @@ var appStart = function () {
 				addView: new NetworkView({model: networkCell})
 			})
 		}),
-		new MainCell({model:new Backbone.Model({lnk:'#modem',img:'modem',name:'Modem'})}),
+		new MainCell({model: new Backbone.Model({lnk: '#modem', img: 'modem', name: 'Modem'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})})
 	];
@@ -202,14 +203,16 @@ var appStart = function () {
 			}));
 		}
 		modemPages   = [
-			{lnk:'#modem/state',name:'State',page:new ModemState({model:modemState})},
-			{lnk:"#modem/settings",name:'Settings',page:new TableContainer({
-				model: schema.get('NSMEP'),
-				className:'col-md-10',
-				tblMode:false,
-				show:true
-			})},
-			{lnk:"#modem/docs",name:'Documents',page:new ModemDocs()}
+			{lnk: '#modem/state', name: 'State', page: new ModemState({model: modemState})},
+			{
+				lnk: "#modem/settings", name: 'Settings', page: new TableContainer({
+				model:     schema.get('NSMEP'),
+				className: 'col-md-10',
+				tblMode:   false,
+				show:      true
+			})
+			},
+			{lnk: "#modem/docs", name: 'Documents', page: new ModemDocs()}
 		];
 		fiscalPages  = [
 			{lnk: '#fm/fisc', name: 'Fiscalization', page: new FiscDo()},

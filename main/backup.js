@@ -417,8 +417,12 @@ var ImportView = BackupSubView.extend({
 					 * if the parsing isn't successfully done
 					 * than push errors
 					 */
+					window.csvText = csvText;
+					csvText             = csvText.replace(/^\s+|\s+$/g, '');
 					var parsedData      = Papa.parse(csvText, {
-						header: true
+						header:         true,
+						delimiter:      self.backupDelimiter,
+						skipEmptyLines: true
 					});
 					var errorMessage    = false;
 					var maxErrorLength  = 5;
@@ -705,7 +709,7 @@ var ImportView = BackupSubView.extend({
 	 * Update the current delimiter
 	 * @param e
 	 */
-	onDelimiterChange:      function (e) {
+	onDelimiterChange:    function (e) {
 		this.backupDelimiter = $(e.target).val();
 	}
 

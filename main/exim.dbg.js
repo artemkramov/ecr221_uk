@@ -902,9 +902,12 @@ var ImportModel = (function () {
 		 */
 		parseCSV:                   function (csvText, fileName) {
 			var deferred   = $.Deferred();
+			csvText = csvText.replace(/^\s+|\s+$/g, '');
+
 			var parsedData = Papa.parse(csvText, {
-				header:    true,
-				delimiter: this.importDelimiter
+				header:         true,
+				delimiter:      this.importDelimiter,
+				skipEmptyLines: true
 			});
 
 			if (!_.isEmpty(parsedData.errors)) {

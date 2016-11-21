@@ -85,6 +85,12 @@ var FiscalCell = Backbone.Model.extend({
                     $this.set("fiscalize", isFiscalized);
                 });
             }
+            /**
+             * Check if the device is in the fiscal mode
+             */
+            if (!_.isUndefined(response["FskMode"])) {
+                $this.set("isFiscalMode", parseInt(response["FskMode"]));
+            }
         });
         $.getJSON("/cgi/tbl/FDay?s=-1",function(data,status){
             if (_.isArray(data)) data = data[0];
