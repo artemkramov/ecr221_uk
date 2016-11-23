@@ -63,6 +63,7 @@ var ModemDocs = PageView.extend({
 		ecrStatus.on('change:CurrDI', this.render, this);
 	},
 	render:     function () {
+		this.delegateEvents();
 		this.$el.html(this.template(ecrStatus.toJSON()));
 		this.$('#docs, #dif').submit(blockDef);
 		return this;
@@ -246,30 +247,48 @@ var GetDateTime = Backbone.View.extend({
  }
  });*/
 
+var ModemSettings = PageView.extend({
+	remove: function () {
+		this.settings.remove();
+		PageView.prototype.remove.call(this);
+	},
+	render: function () {
+		this.settings = new TableContainer({
+			model:   schema.get('NSMEP'),
+			tblMode: false,
+			show:    true
+		});
+		this.delegateEvents();
+		this.$el.html('');
+		this.$el.append(this.settings.render().$el);
+		return this;
+	}
+});
+
 var FiscDo = PageView.extend({
-	events:     {
+	events:    {
 		'click #hd':  'saveHdr',
 		'click #tx':  'saveTax',
 		'click #fsc': 'fiscalize'
 	},
-	remove:     function () {
+	remove:    function () {
 		this.header.remove();
 		this.taxes.remove();
 		this.fsk.remove();
 		PageView.prototype.remove.call(this);
 	},
-	render:     function () {
-		this.header = new TableContainer({
+	render:    function () {
+		this.header       = new TableContainer({
 			model:   schema.get('Hdr'),
 			tblMode: true,
 			show:    true
 		});
-		this.taxes  = new TableContainer({
+		this.taxes        = new TableContainer({
 			model:   schema.get('Tax'),
 			tblMode: true,
 			show:    true
 		});
-		this.fsk    = new TableContainer({
+		this.fsk          = new TableContainer({
 			model:   schema.get('Fsk'),
 			tblMode: false,
 			show:    true
@@ -279,7 +298,7 @@ var FiscDo = PageView.extend({
 		this.$el.append(this.header.render().$el);
 		this.$el.append(this.taxes.render().$el);
 		this.$el.append(this.fsk.render().$el);
-		var tmpl = "<button type='button' id='%s' class='btn btn-%s' data-loading-text='%s'>%s</button>\n";
+		var tmpl          = "<button type='button' id='%s' class='btn btn-%s' data-loading-text='%s'>%s</button>\n";
 		/**
 		 * The buttons on the bottom of the page
 		 * @type {*[]}
@@ -300,14 +319,14 @@ var FiscDo = PageView.extend({
 		));
 		return this;
 	},
-	checkTime:  function (proc, e) {
+	checkTime: function (proc, e) {
 		var ecrDate  = ecrStatus.getTime();
 		var currDate = new Date();
 		ecrDate.setHours(0, 0, 0, 0);
 		currDate.setHours(0, 0, 0, 0);
 		proc(e);
 	},
-	saveHdr:    function (e) {
+	saveHdr:   function (e) {
 		e.preventDefault();
 		var self         = this;
 		var confirmModal = new ConfirmModal();
@@ -321,7 +340,7 @@ var FiscDo = PageView.extend({
 		confirmModal.show();
 		return false;
 	},
-	saveTax:    function (e) {
+	saveTax:   function (e) {
 		e.preventDefault();
 		var self         = this;
 		var confirmModal = new ConfirmModal();
@@ -335,7 +354,7 @@ var FiscDo = PageView.extend({
 		confirmModal.show();
 		return false;
 	},
-	fiscalize:  function (e) {
+	fiscalize: function (e) {
 		e.preventDefault();
 		var self         = this;
 		var confirmModal = new ConfirmModal();
@@ -349,15 +368,15 @@ var FiscDo = PageView.extend({
 		confirmModal.show();
 		return false;
 	},
-	doHdr:      function (e) {
+	doHdr:     function (e) {
 		callProc({addr: '/cgi/proc/puthdrfm', btn: e.target/*'#hd'*/});
 		//console.log('Save Hdr');
 	},
-	doTax:      function (e) {
+	doTax:     function (e) {
 		callProc({addr: '/cgi/proc/puttaxfm', btn: e.target/*'#tx'*/});
 		//console.log('Save Tax');
 	},
-	doFisc:     function (e) {
+	doFisc:    function (e) {
 		callProc({addr: '/cgi/proc/fiscalization', btn: e.target/*'#fsc'*/});
 		//console.log('Fiscalize');
 	}
@@ -446,23 +465,23 @@ var FiscReset = TimeForm.extend({
 //</editor-fold>
 
 var ReportPage = Backbone.View.extend({
-	tagName:  'div',
-	events:   {
-		'click #xr': 'xrep',
-		'click #zr': 'zrep',
-		'click #pN': 'prnNum',
-		'click #pD': 'prnDate',
+	tagName:       'div',
+	events:        {
+		'click #xr':                   'xrep',
+		'click #zr':                   'zrep',
+		'click #pN':                   'prnNum',
+		'click #pD':                   'prnDate',
 		'click [name="radio-option"]': 'onOptionClick',
-		'submit #form-print-ksef': 'printKSEF'
+		'submit #form-print-ksef':     'printKSEF'
 	},
-	template: _.template($('#reports-tmpl').html()),
-	render:   function () {
+	template:      _.template($('#reports-tmpl').html()),
+	render:        function () {
 		var self = this;
 		$.ajax({
-			url: "/cgi/tbl/FDay",
+			url:      "/cgi/tbl/FDay",
 			dataType: 'json',
-			async: false,
-			success: function (response) {
+			async:    false,
+			success:  function (response) {
 				var maximumNumber = 0;
 				if (_.isArray(response) && !_.isEmpty(response)) {
 					maximumNumber = response.length;
@@ -474,17 +493,17 @@ var ReportPage = Backbone.View.extend({
 		});
 		return this;
 	},
-	xrep:     function (e) {
+	xrep:          function (e) {
 		e.preventDefault();
 		callProc({addr: '/cgi/proc/printreport', btn: e.target}, 10);
 		return false;
 	},
-	zrep:     function (e) {
+	zrep:          function (e) {
 		e.preventDefault();
 		callProc({addr: '/cgi/proc/printreport', btn: e.target}, 0);
 		return false;
 	},
-	prnNum:   function (e) {
+	prnNum:        function (e) {
 		e.preventDefault();
 		callProc({
 			addr: '/cgi/proc/printfmreport',
@@ -492,7 +511,7 @@ var ReportPage = Backbone.View.extend({
 		}, $('#isShort').prop('checked') ? 4 : 2, '2015-01-01', '2015-01-01', $('#fromN').val(), $('#toN').val());
 		return false;
 	},
-	prnDate:  function (e) {
+	prnDate:       function (e) {
 		e.preventDefault();
 		callProc({
 			addr: '/cgi/proc/printfmreport',
@@ -502,7 +521,7 @@ var ReportPage = Backbone.View.extend({
 	},
 	onOptionClick: function (e) {
 		var currentOptionValue = $(e.target).val();
-		var inputCheckNumber = this.$el.find(".check-number");
+		var inputCheckNumber   = this.$el.find(".check-number");
 		switch (parseInt(currentOptionValue)) {
 			case 1:
 			case 2:
@@ -513,11 +532,11 @@ var ReportPage = Backbone.View.extend({
 				break;
 		}
 	},
-	printKSEF: function (e) {
+	printKSEF:     function (e) {
 		e.preventDefault();
-		var fromNumber = parseInt($("#from-number").val());
-		var toNumber = parseInt($("#to-number").val());
-		var number = $("#report-number").val();
+		var fromNumber     = parseInt($("#from-number").val());
+		var toNumber       = parseInt($("#to-number").val());
+		var number         = $("#report-number").val();
 		var selectedOption = $("input[name='radio-option']:checked").val();
 		switch (parseInt(selectedOption)) {
 			case 1:
@@ -537,7 +556,7 @@ var ReportPage = Backbone.View.extend({
 		var btn = this.$el.find('#btn-print-ksef');
 		callProc({
 			addr: '/cgi/proc/printmmcjrn',
-			btn: btn
+			btn:  btn
 		}, number, fromNumber, toNumber);
 		return false;
 	}

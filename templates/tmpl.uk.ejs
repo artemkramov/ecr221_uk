@@ -60,7 +60,7 @@
     </div>
     <div class="row">
         <div class="well col-md-6">
-            <form id="docs" name="docs" class="form-horizontal">
+            <form id="docs" name="docs" class="">
                 <legend><%= t('Check document:') %></legend>
                 <div class="form-group"><label class="control-label" for="doc_di">DI:</label>
                     <input type="number" class="form-control" id="doc_di" name="doc_di"/>
@@ -72,7 +72,7 @@
             </form>
         </div>
         <div class="well col-md-6">
-            <form id="dif" name="dif" class="form-horizontal">
+            <form id="dif" name="dif" class="">
                 <legend><%= t('Get DI') %></legend>
                 <div class="form-group"><label class="control-label" for="doc_z"><%= t('Z#') %></label>
                     <input class="form-control" type="number" id="doc_z" name="doc_z"/>
@@ -82,8 +82,8 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="di_chk" class="btn btn-default">Чеки</button>
-                        <button id="di_z" class="btn btn-default">Звіт</button>
+                        <button id="di_chk" class="btn btn-default"><%= t('Checks') %></button>
+                        <button id="di_z" class="btn btn-default"><%= t('Report') %></button>
                     </div>
                 </div>
             </form>

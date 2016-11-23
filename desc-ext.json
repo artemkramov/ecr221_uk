@@ -151,7 +151,9 @@
       "Report copy": "Копия отчета",
       "Consumption checks": "Расходные чеки",
       "Checks for": "Чеки продаж",
-      "Delimiter": "Разделитель"
+      "Delimiter": "Разделитель",
+      "Checks": "Чеки",
+      "Report": "Отчет"
     }
   },
   "uk": {
@@ -306,7 +308,9 @@
       "Report copy": "Копія звіту",
       "Consumption checks": "Видаткові чеки",
       "Checks for": "Чеки продаж",
-      "Delimiter": "Роздільник"
+      "Delimiter": "Роздільник",
+      "Checks": "Чеки",
+      "Report": "Звіт"
     }
   }
 }

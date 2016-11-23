@@ -205,12 +205,7 @@ var appStart = function () {
 		modemPages   = [
 			{lnk: '#modem/state', name: 'State', page: new ModemState({model: modemState})},
 			{
-				lnk: "#modem/settings", name: 'Settings', page: new TableContainer({
-				model:     schema.get('NSMEP'),
-				className: 'col-md-10',
-				tblMode:   false,
-				show:      true
-			})
+				lnk: "#modem/settings", name: 'Settings', page: new ModemSettings()
 			},
 			{lnk: "#modem/docs", name: 'Documents', page: new ModemDocs()}
 		];
