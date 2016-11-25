@@ -61,37 +61,7 @@ var FiscalCell = Backbone.Model.extend({
             }
             //$this.set('fiscalize',$this.has('firstRep'));
         });
-        $.getJSON("/cgi/state", function (response) {
-            /**
-             * If the response has a field fiscalization
-             * than set it as fiscalization
-             */
-            if (!_.isUndefined(response["Fiscalization"])) {
-                $this.set("fiscalize", response["Fiscalization"]);
-            }
-            else {
-                /**
-                 * Load data from FTax and FSbr
-                 * If both tables are empty - not fiscalized
-                 * Else - fiscalized
-                 */
-                $this.loadFiscalizationData().then(function () {
-                    var isFiscalized = false;
-                    _.each(arguments, function (response) {
-                        if (_.isArray(response) && response[1] == 'success' && _.isObject(response[0]) && !_.isEmpty(response[0])) {
-                            isFiscalized = true;
-                        }
-                    });
-                    $this.set("fiscalize", isFiscalized);
-                });
-            }
-            /**
-             * Check if the device is in the fiscal mode
-             */
-            if (!_.isUndefined(response["FskMode"])) {
-                $this.set("isFiscalMode", parseInt(response["FskMode"]));
-            }
-        });
+
         $.getJSON("/cgi/tbl/FDay?s=-1",function(data,status){
             if (_.isArray(data)) data = data[0];
             if (_.isObject(data)) {
@@ -116,7 +86,46 @@ var FiscalCell = Backbone.Model.extend({
             dataType: 'json'
         }));
         return $.when.apply($, promises);
+    },
+    initializeFiscalMode: function () {
+        var deferred = $.Deferred();
+        var $this = this;
+        $.getJSON("/cgi/state", function (response) {
+            /**
+             * Check if the device is in the fiscal mode
+             */
+            if (!_.isUndefined(response["FskMode"])) {
+                $this.set("isFiscalMode", parseInt(response["FskMode"]));
+            }
+            /**
+             * If the response has a field fiscalization
+             * than set it as fiscalization
+             */
+            if (!_.isUndefined(response["Fiscalization"])) {
+                $this.set("fiscalize", response["Fiscalization"]);
+                return deferred.resolve();
+            }
+            else {
+                /**
+                 * Load data from FTax and FSbr
+                 * If both tables are empty - not fiscalized
+                 * Else - fiscalized
+                 */
+                $this.loadFiscalizationData().then(function () {
+                    var isFiscalized = false;
+                    _.each(arguments, function (response) {
+                        if (_.isArray(response) && response[1] == 'success' && _.isObject(response[0]) && !_.isEmpty(response[0])) {
+                            isFiscalized = true;
+                        }
+                    });
+                    $this.set("fiscalize", isFiscalized);
+                    return deferred.resolve();
+                });
+            }
+        });
+        return deferred.promise();
     }
+
 });
 
 var TableModel = Backbone.Model.extend({

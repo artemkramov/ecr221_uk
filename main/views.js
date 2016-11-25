@@ -1498,6 +1498,7 @@ var Log = Backbone.View.extend({
 	render:   function () {
 		this.$el.html(this.template());
 		this.insertPoint = this.$('#logtxt');
+		$(".nav-stacked").addClass('static');
 		return this;
 	},
 	add:      function (to) {
@@ -1523,6 +1524,7 @@ var Log = Backbone.View.extend({
 		this.insertPoint = 0;
 		this.progs       = {};
 		$.get('/cgi/log?p=1');
+		$(".nav-stacked").removeClass('static');
 	},
 	tick:     function () {
 		$.ajax({url: "cgi/log", context: this}).done(function (t) {

@@ -1,6 +1,6 @@
 <script type="text/template" id="modem-state">
     <table class="table table-striped">
-        <caption><h2><%= t('Modem') %></h2></caption>
+        <caption><h2 style="margin-top: 0px"><%= t('Modem') %></h2></caption>
         <tr>
             <td><%= t('Personalized with ID_SAM') %></td>
             <td><%= decHexStr(pers_sam_id) %></td>
@@ -46,9 +46,6 @@
         </tr>
     </table>
 
-    <button class="btn btn-default" id="sam_switch">
-        <% print(t((card_no == '-') ? 'On' : 'Off')) %>
-    </button>
     <button class="btn btn-primary" id="sam_wr"><%= t('SAM personalization') %></button>
     <button class="btn btn-primary" id="pers_do"><%= t('Personalization') %></button>
 

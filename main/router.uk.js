@@ -113,7 +113,7 @@ var appStart = function () {
 	fiscalCell  = new FiscalCell({
 		firstRep:     1,
 		firstTime:    new Date(2000, 1, 1),
-		fiscalize:    true,
+		fiscalize:    false,
 		lastRep:      5000,
 		lastTime:     new Date(),
 		isFiscalMode: false
@@ -183,7 +183,7 @@ var appStart = function () {
 	schema.load(function () {
 		schemaLoaded.resolve();
 	});
-	$.when(qryDone, schemaLoaded).always(function () {
+	$.when(qryDone, schemaLoaded, fiscalCell.initializeFiscalMode()).always(function () {
 		if (schema.get('PLU')) {
 			mainScreenCells.unshift(new MainCell({
 				model: new Backbone.Model(
@@ -202,20 +202,23 @@ var appStart = function () {
 					})
 			}));
 		}
-		modemPages   = [
+		modemPages          = [
 			{lnk: '#modem/state', name: 'State', page: new ModemState({model: modemState})},
 			{
 				lnk: "#modem/settings", name: 'Settings', page: new ModemSettings()
 			},
 			{lnk: "#modem/docs", name: 'Documents', page: new ModemDocs()}
 		];
-		fiscalPages  = [
+		fiscalPages         = [
 			{lnk: '#fm/fisc', name: 'Fiscalization', page: new FiscDo()},
-			{lnk: '#fm/time', name: 'Time', page: new FiscTime()},
-			{lnk: '#fm/reset', name: 'Reset', page: new FiscReset()}
+			{lnk: '#fm/time', name: 'Time', page: new FiscTime()}
 		];
-		var models   = schema.tableGroup('net');
-		networkViews = [new InterfacesTable()];
+		var fiscalResetPage = {lnk: '#fm/reset', name: 'Reset', page: new FiscReset()};
+		if (fiscalCell.get("isFiscalMode")) {
+			fiscalPages.push(fiscalResetPage);
+		}
+		var models          = schema.tableGroup('net');
+		networkViews        = [new InterfacesTable()];
 		if (gprsExists) {
 			networkViews.push(new GPRSState());
 		}

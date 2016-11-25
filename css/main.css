@@ -47,3 +47,6 @@ a img:active {-webkit-transform: scale(1);transform: scale(1);}
 .backup-delimiter {
     max-width: 60px;
 }
+.nav-stacked.static {
+    position: static;
+}
