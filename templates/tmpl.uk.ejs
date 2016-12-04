@@ -117,7 +117,7 @@
         </tr>
         <tr>
             <td><b><%= t('Fiscal#') %></b></td>
-            <td><%= dev_fn %></td>
+            <td><%= t('FN') + dev_fn %></td>
         </tr>
         <tr>
             <td><b><%= t('Taxes#') %></b></td>
@@ -171,71 +171,73 @@
             <h3><%= t('By date') %></h3>
 
             <form class="form-inline">
-                <div class="form-group"><label for="fromD"><%= t('From') + ': ' %></label><input type="date"
-                                                                                                 class="form-control"
-                                                                                                 id="fromD"></div>
-                <div class="form-group"><label for="toD"><%= t('To') + ': ' %></label><input type="date"
-                                                                                             class="form-control"
-                                                                                             id="toD"></div>
+                <div class="form-group">
+                    <label for="fromD"><%= t('From') + ': ' %></label>
+                    <input type="text" class="form-control form-datepicker" id="fromD">
+                </div>
+                <div class="form-group">
+                    <label for="toD"><%= t('To') + ': ' %></label>
+                    <input type="text" class="form-control form-datepicker" id="toD">
+                </div>
                 <button type="submit" class="btn btn-default" id="pD"
                         data-loading-text="<%= t('Wait...') %>"><%= t('Print') %></button>
             </form>
             <form class="form-inline">
-                <div class="form-group"><input type="checkbox" class="form-control" id="isShort"><%= t('Short') %></div>
+                <div class="form-group"><input type="checkbox" class="" id="isShort"><%= t('Short') %></div>
             </form>
         </div>
     </div>
 
     <% if (fiscalCell.get("isFiscalMode")) { %>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><%= t('Print KSEF') %></h3>
-            </div>
-            <div class="panel-body">
-                <form id="form-print-ksef">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="report-number"><%= t('Report number') + ': ' %></label>
-                                <input type="number" class="form-control" id="report-number" min="0"
-                                       max="<%= maximumNumber %>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="from-number"><%= t('Start check number') + ': ' %></label>
-                                <input type="number" class="form-control check-number" id="from-number" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="to-number"><%= t('End check number') + ': ' %></label>
-                                <input type="number" class="form-control check-number" id="to-number" required>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <div class="radio">
-                                    <label><input type="radio" name="radio-option" value="1"><%= t("All check range") %>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label><input type="radio" name="radio-option" value="2"><%= t("Report copy") %></label>
-                                </div>
-                                <div class="radio">
-                                    <label><input type="radio" name="radio-option" value="3"><%= t("Consumption checks") %>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label><input type="radio" name="radio-option" value="4" checked><%= t("Checks for") %>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <button type="submit" class="btn btn-default" id="btn-print-ksef"
-                            data-loading-text="<%= t('Wait...') %>"><%= t('Print') %></button>
-                </form>
-            </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><%= t('Print KSEF') %></h3>
         </div>
+        <div class="panel-body">
+            <form id="form-print-ksef">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="report-number"><%= t('Report number') + ': ' %></label>
+                            <input type="number" class="form-control" id="report-number" min="0"
+                                   max="<%= maximumNumber %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="from-number"><%= t('Start check number') + ': ' %></label>
+                            <input type="number" class="form-control check-number" id="from-number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="to-number"><%= t('End check number') + ': ' %></label>
+                            <input type="number" class="form-control check-number" id="to-number" required>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="radio">
+                                <label><input type="radio" name="radio-option" value="1"><%= t("All check range") %>
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="radio-option" value="2"><%= t("Report copy") %></label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="radio-option" value="3"><%= t("Consumption checks") %>
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="radio-option" value="4" checked><%= t("Checks for") %>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <button type="submit" class="btn btn-default" id="btn-print-ksef"
+                        data-loading-text="<%= t('Wait...') %>"><%= t('Print') %></button>
+            </form>
+        </div>
+    </div>
     <% } %>
     <% } %>
     <a href="#" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"

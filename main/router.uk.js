@@ -23,6 +23,7 @@ var AppRouter = Backbone.Router.extend({
 		}
 		if (callback) callback.apply(this, args);
 		$('#content').html('').append(this.view.render().$el);
+		initWidgets();
 	},
 	mainScr: function () {
 		this.view = new MainScreenView({inrow: 2, cells: mainScreenCells});
