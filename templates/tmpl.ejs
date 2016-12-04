@@ -4,15 +4,15 @@
     <tr>
         <th><%= t('Fiscalized') %>:</th>
         <td>
-            <%
-                print(t('yes'));
-            %>
+            <%= t('yes') %>
         </td>
     </tr>
+    <% if (!_.isUndefined(lastRep) && !_.isUndefined(lastTime)) { %>
     <tr>
         <th><%= t('Last report') %>:</th>
-        <td><%= [lastRep, t('on'), dateStr(lastTime, 'd')].join(' ') %></td>
+        <td>#<%= [lastRep, t('on'), dateStr(lastTime, 'd')].join(' ') %></td>
     </tr>
+    <% } %>
     <% } else { %>
     <tr>
         <td><%= t('Fiscalized') %>:</td>

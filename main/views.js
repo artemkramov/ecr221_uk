@@ -314,7 +314,15 @@ var PrgView = AddView.extend({
 });
 
 var FiscalView = AddView.extend({
-	template: _.template($('#fiscal-cell').html())
+	template: _.template($('#fiscal-cell').html()),
+	render:     function () {
+		try {
+			this.$el.html(this.template(this.model.toJSON()));
+		} catch (e) {
+			console.log('error', e);
+		}
+		return this;
+	}
 	//initialize: function() {
 	//    fiscalCell.on('changed',this.render,this);
 	//}

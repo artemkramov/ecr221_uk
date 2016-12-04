@@ -114,8 +114,8 @@ var appStart = function () {
 		firstRep:     1,
 		firstTime:    new Date(2000, 1, 1),
 		fiscalize:    false,
-		lastRep:      5000,
-		lastTime:     new Date(),
+		lastRep:      undefined,
+		lastTime:     undefined,
 		isFiscalMode: false
 	});
 	networkCell = new NetworkInfo();
