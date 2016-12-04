@@ -468,7 +468,7 @@ var ExportModel = function () {
 						var csv       = Papa.unparse(data, {
 							delimiter: self.exportDelimiter
 						});
-						zip.file(model.get('id') + ".csv", csv);
+						zip.file(model.get('id') + ".csv", '\uFEFF' + csv);
 					}
 				});
 				if (self.isRunning) {
@@ -720,41 +720,48 @@ var ImportModel = (function () {
 			 * Init schema data
 			 */
 			var modelData = schema.get(tableName);
-			modelData.id  = modelData.get("name");
 			if (self.isRunning && modelData) {
-				backupFile.async("string").then(function (csvText) {
-
-					/**
-					 * Parse CSV data
-					 */
-					self.parseCSV(csvText, backupFile.name).done(function (parsedData) {
+				backupFile.async("uint8array").then(function (csvBuffer) {
+					window.csvBuffer = csvBuffer;
+					var bb = new Blob([csvBuffer]);
+					var f = new FileReader();
+					f.onload = function(e) {
+						var csvText = e.target.result;
 						/**
-						 * Wait until we fetch all records from the table
-						 * @type {*[]}
+						 * Parse CSV data
 						 */
-						var promises = [
-							schema.tableFetchIgnoreCache(tableName)
-						];
-						$.when.apply($, promises).done(function () {
+						self.parseCSV(csvText, backupFile.name).done(function (parsedData) {
 							/**
-							 * Reset the progress bar and set the current import model
+							 * Wait until we fetch all records from the table
+							 * @type {*[]}
 							 */
-							self.setProgressData(0);
-							self.modelPercentage.set("name", schema.get(tableName).get("name"));
-							var options   = {
-								schema: modelData,
-								urlAdd: schema.url + '/' + tableName
-							};
-							options.model = TableModel.extend(options);
-							var tableData = schema.tableIgnoreCache(tableName);
+							var promises = [
+								schema.tableFetchIgnoreCache(tableName)
+							];
+							$.when.apply($, promises).done(function () {
+								/**
+								 * Reset the progress bar and set the current import model
+								 */
+								self.setProgressData(0);
+								self.modelPercentage.set("name", schema.get(tableName).get("name"));
+								var options   = {
+									schema: modelData,
+									urlAdd: schema.url + '/' + tableName
+								};
+								options.model = TableModel.extend(options);
+								var tableData = schema.tableIgnoreCache(tableName);
 
-							self.processData(parsedData, modelData, tableData, options).done(function () {
-								return deferred.resolve();
+								self.processData(parsedData, modelData, tableData, options).done(function () {
+									return deferred.resolve();
+								});
 							});
+						}).fail(function () {
+							return deferred.resolve();
 						});
-					}).fail(function () {
-						return deferred.resolve();
-					});
+					};
+
+					f.readAsText(bb, "windows-1251");
+
 				});
 			}
 			else {
@@ -773,6 +780,10 @@ var ImportModel = (function () {
 		processData:                function (parsedData, modelData, tableData, options) {
 			var deferred    = $.Deferred();
 			var self        = this;
+			var modelDataHistory = {
+				id:    modelData.get("name"),
+				error: false
+			};
 			modelData.error = false;
 			/**
 			 * If the model data - table data
@@ -817,7 +828,7 @@ var ImportModel = (function () {
 					});
 					collections.push(collection);
 				});
-				self.processCollectionRecursive(collections, modelData, 0, deferred);
+				self.processCollectionRecursive(collections, modelDataHistory, 0, deferred);
 			}
 			/**
 			 * If the model - form
@@ -834,7 +845,7 @@ var ImportModel = (function () {
 					var promise = model.save(data, {
 						patch: true, silent: true, wait: true, parse: false,
 						error: function (model, response) {
-							modelData.error = true;
+							modelDataHistory.error = true;
 							events.trigger(self.errorLabel, t("Uncaught error"));
 							return deferred.resolve();
 						}
@@ -847,14 +858,14 @@ var ImportModel = (function () {
 							if (!_.isUndefined(response.err.f)) {
 								errorMessage += " - " + response.err.f;
 							}
-							modelData.result = errorMessage;
-							modelData.error  = true;
-							self.history.push(modelData);
+							modelDataHistory.result = errorMessage;
+							modelDataHistory.error  = true;
+							self.history.push(modelDataHistory);
 							events.trigger(self.errorLabel, errorMessage);
 						}
 						else {
-							modelData.result = t("Finished");
-							self.history.push(modelData);
+							modelDataHistory.result = t("Finished");
+							self.history.push(modelDataHistory);
 						}
 						return deferred.resolve();
 					});
@@ -901,13 +912,15 @@ var ImportModel = (function () {
 		 * @returns {*}
 		 */
 		parseCSV:                   function (csvText, fileName) {
-			var deferred   = $.Deferred();
-			csvText = csvText.replace(/^\s+|\s+$/g, '');
+
+			var deferred = $.Deferred();
+			csvText      = csvText.replace(/^\s+|\s+$/g, '');
 
 			var parsedData = Papa.parse(csvText, {
 				header:         true,
 				delimiter:      this.importDelimiter,
-				skipEmptyLines: true
+				skipEmptyLines: true,
+				encoding:       "windows-1251"
 			});
 
 			if (!_.isEmpty(parsedData.errors)) {
