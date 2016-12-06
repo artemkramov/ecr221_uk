@@ -789,7 +789,6 @@ var FormDisplay = Backbone.View.extend({
 		return this;
 	},
 	onSync:        function () {
-		console.log('on sync');
 		this.fill(true, true);
 	},
 	change:        function (pos) {
