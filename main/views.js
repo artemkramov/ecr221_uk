@@ -9,7 +9,7 @@
  * Creates one elemView per collection item and insert it to appendEl
  */
 var CollectionView = Backbone.View.extend({
-	subView:    {},
+	subViews:    [],
 	initialize: function (args) {
 		if (args && args.elemView) this.elemView = args.elemView;
 		this.initEl();
@@ -21,8 +21,9 @@ var CollectionView = Backbone.View.extend({
 		this.appendEl = this.$el;
 	},
 	addElem:    function (f) {
-		this.subView = new this.elemView({model: f});
-		this.appendEl.append(this.subView.render().$el);
+		var subView = new this.elemView({model: f});
+		this.subViews.push(subView);
+		this.appendEl.append(subView.render().$el);
 	},
 	addAll:     function () {
 		this.initEl();
@@ -34,7 +35,9 @@ var CollectionView = Backbone.View.extend({
 		return this;
 	},
 	remove:     function () {
-		this.subView.remove();
+		_.each(this.subViews, function (subView) {
+			subView.remove();
+		});
 	}
 });
 

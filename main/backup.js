@@ -147,6 +147,10 @@ var ExportView = BackupSubView.extend({
 		var models      = _.filter(schema.models, function (model) {
 			return (!_.isUndefined(model.syncCol)) && (_.indexOf(self.excludeModels, model.get('id')) == -1);
 		});
+		var logoItem = new Backbone.Model();
+		logoItem.set('id', 'Logo');
+		logoItem.set('name', t('Logo'));
+		models.unshift(logoItem);
 		var compiled    = _.template($("#backup-export-list").html());
 		this.backupList = compiled({
 			models: models
@@ -161,9 +165,15 @@ var ExportView = BackupSubView.extend({
 	onButtonRunExportClick: function (e) {
 		var models = [];
 		var self   = this;
+		var isLogoExported = false;
 		$(".table-backup-list").find(".model-checkbox").each(function () {
 			if ($(this).prop('checked')) {
-				models.push(schema.get($(this).data('id')));
+				if ($(this).data('id') == 'Logo') {
+					isLogoExported = true;
+				}
+				else {
+					models.push(schema.get($(this).data('id')));
+				}
 			}
 		});
 		if (!_.isEmpty(models)) {
@@ -174,7 +184,9 @@ var ExportView = BackupSubView.extend({
 			}
 			ExportModel.run(models).done(function (zip) {
 				self.exportLogo().done(function (response) {
-					zip.file("logo.bmp", response, {binary: true});
+					if (isLogoExported) {
+						zip.file("logo.bmp", response, {binary: true});
+					}
 					zip.generateAsync({type: "blob"})
 						.then(function (content) {
 							ExportModel.stop();
