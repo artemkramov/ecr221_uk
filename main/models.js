@@ -91,6 +91,12 @@ var FiscalCell = Backbone.Model.extend({
 		var $this    = this;
 		$.getJSON("/cgi/state", function (response) {
 			/**
+			 * Check if the device is in the fiscal mode
+			 */
+			if (!_.isUndefined(response["FskMode"])) {
+				$this.set("isFiscalPrinter", true);
+			}
+			/**
 			 * Load last fiscalization report
 			 */
 			$.getJSON("/cgi/tbl/FDay?s=-1", function (data) {
@@ -102,12 +108,6 @@ var FiscalCell = Backbone.Model.extend({
 					if ('Date' in data) {
 						$this.set('lastTime', new Date(data.Date * 1000));
 					}
-				}
-				/**
-				 * Check if the device is in the fiscal mode
-				 */
-				if (!_.isUndefined(response["FskMode"])) {
-					$this.set("isFiscalMode", parseInt(response["FskMode"]));
 				}
 				/**
 				 * If the response has a field fiscalization

@@ -19,6 +19,30 @@
  return "";
  }*/
 
+
+function initDateTime() {
+	$.fn.datetimepicker.dates['cs'] = {
+		days:        ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"],
+		daysShort:   ["Ned", "Pon", "Úte", "Stř", "Čtv", "Pát", "Sob", "Ned"],
+		daysMin:     ["Ne", "Po", "Út", "St", "Čt", "Pá", "So", "Ne"],
+		months:      ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
+		monthsShort: ["Led", "Úno", "Bře", "Dub", "Kvě", "Čer", "Čnc", "Srp", "Zář", "Říj", "Lis", "Pro"],
+		today:       "Dnes",
+		suffix:      [],
+		meridiem:    []
+	};
+
+	$(".form-datetime").datetimepicker({format: 'dd-mm-yyyy hh:ii:ss', language: schema.lang});
+}
+
+function getDatetime(dateTime) {
+	if (!_.isEmpty(dateTime)) {
+		var parts = dateTime.split(' ');
+		var date  = parts[0].split('-');
+		return new Date(date[2] + '-' + date[1] + '-' + date[0] + ' ' + parts[1]);
+	}
+}
+
 function toCamelCase(str) {
 	// Lower cases the string
 	return str.toLowerCase()
@@ -85,7 +109,6 @@ function wait(tmo) {
 
 function IP2Str(ip) {
 	if (_.isFinite(ip)) return ((ip >> 24) & 0xFF) + '.' + ((ip >> 16) & 0xFF) + '.' + ((ip >> 8) & 0xFF) + '.' + (ip & 0xFF);
-	if (_.isUndefinite(ip)) return '-';
 	return ip;
 }
 
@@ -190,6 +213,9 @@ function initWidgets() {
 		format:  "mm/dd/yyyy",
 		minView: 2
 	});
+
+	initDateTime();
+
 }
 
 function setDate(elem, date) {

@@ -21,6 +21,7 @@ var AppRouter = Backbone.Router.extend({
 			this.view.remove();
 			delete this.view;
 		}
+		htmlLog.close();
 		if (callback) callback.apply(this, args);
 		$('#content').html('').append(this.view.render().$el);
 		initWidgets();
@@ -113,12 +114,12 @@ var appStart = function () {
 	gprsExists = false;
 	//var pluCell = new Backbone.Model({size:0});
 	fiscalCell  = new FiscalCell({
-		firstRep:     1,
-		firstTime:    new Date(2000, 1, 1),
-		fiscalize:    false,
-		lastRep:      undefined,
-		lastTime:     undefined,
-		isFiscalMode: false
+		firstRep:        1,
+		firstTime:       new Date(2000, 1, 1),
+		fiscalize:       false,
+		lastRep:         undefined,
+		lastTime:        undefined,
+		isFiscalPrinter: false
 	});
 	networkCell = new NetworkInfo();
 
@@ -155,7 +156,7 @@ var appStart = function () {
 				addView: new NetworkView({model: networkCell})
 			})
 		}),
-		new MainCell({model: new Backbone.Model({lnk: '#modem', img: 'modem', name: 'Modem'})}),
+		new MainCell({model: new Backbone.Model({lnk: '#modem/state', img: 'modem', name: 'Modem'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})})
 	];
@@ -179,8 +180,12 @@ var appStart = function () {
 	var qryDone      = $.Deferred();
 	var schemaLoaded = $.Deferred();
 
-	networkCell.refresh().always(function () {
-		qryDone.resolve();
+	$.get('/cgi/mdm_info').done(function () {
+		gprsExists = true;
+	}).always(function () {
+		networkCell.refresh().always(function () {
+			qryDone.resolve();
+		});
 	});
 	schema.load(function () {
 		schemaLoaded.resolve();
@@ -216,11 +221,11 @@ var appStart = function () {
 			{lnk: '#fm/time', name: 'Time', page: new FiscTime()}
 		];
 		var fiscalResetPage = {lnk: '#fm/reset', name: 'Reset', page: new FiscReset()};
-		if (fiscalCell.get("isFiscalMode")) {
+		if (fiscalCell.get("isFiscalPrinter")) {
 			fiscalPages.push(fiscalResetPage);
 		}
-		var models          = schema.tableGroup('net');
-		networkViews        = [new InterfacesTable()];
+		var models   = schema.tableGroup('net');
+		networkViews = [new InterfacesTable()];
 		if (gprsExists) {
 			networkViews.push(new GPRSState());
 		}

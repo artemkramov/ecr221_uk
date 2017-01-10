@@ -211,6 +211,13 @@ var GetDateTime = Backbone.View.extend({
 	},
 	getDate:    function () {
 		if (this.$("input:checked").length) return new Date();
+		var date = this.$('#d').val();
+		if (!_.isEmpty(date)) {
+			return new Date(getDatetime(date));
+		}
+		else {
+			return new Date();
+		}
 		if (is_type['datetime-local'])
 		//return this.$('#d')[0].valueAsDate; Chrome do not set valueAsDate for this type of input.
 			var dt = new Date();
@@ -516,7 +523,7 @@ var ReportPage = Backbone.View.extend({
 		callProc({
 			addr: '/cgi/proc/printfmreport',
 			btn:  e.target
-		}, $('#isShort').prop('checked') ? 3 : 1, toStringDate(getDate('fromD', true), 'y-m-d'), toStringDate(getDate('toD', true), 'y-m-d'), 1, 1);
+		}, $('#isShort').prop('checked') ? 3 : 1, toStringDate(new Date($("#fromD").val()), 'y-m-d'), toStringDate(new Date($("#toD").val()), 'y-m-d'), 1, 1);
 		return false;
 	},
 	onOptionClick: function (e) {

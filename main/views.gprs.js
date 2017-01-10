@@ -24,6 +24,7 @@ var GPRSState = Backbone.View.extend({
         return this;
     },
     render: function() {
+        this.delegateEvents();
         if(!_.isEmpty(this.model.attributes)) {
             var e = this.model.toJSON();
             e = this.template(e);
