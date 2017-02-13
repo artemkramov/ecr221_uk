@@ -109,6 +109,7 @@ var AppRouter = Backbone.Router.extend({
 });
 
 var appStart = function () {
+	window.isGNOME = false;
 	ecrStatus  = new ECRStatus();
 	modemState = new ModemStatus();
 	gprsExists = false;

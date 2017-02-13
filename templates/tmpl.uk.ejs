@@ -188,6 +188,7 @@
         </div>
     </div>
 
+    <% if (!window.isGNOME || (window.isGNOME && fiscalCell.get("isFiscalPrinter"))) { %>
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title"><%= t('Print KSEF') %></h3>
@@ -237,6 +238,7 @@
             </form>
         </div>
     </div>
+    <% } %>
     <% } %>
     <a href="#" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"
                                                             aria-hidden="true"></span> <%= t('Back') %></a>

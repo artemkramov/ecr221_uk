@@ -182,7 +182,9 @@
         <div class="form-group">
             <div class="btn-group col-md-offset-2">
                 <button class="btn btn-default" data-loading-text="<%= t('Saving...') %>"><%= t('Save') %></button>
+                <% if (!window.isGNOME) { %>
                 <input type="reset" value="<%= t('Reset') %>" class="btn btn-default"/>
+                <% } %>
             </div>
         </div>
     </form>

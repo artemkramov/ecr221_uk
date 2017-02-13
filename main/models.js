@@ -96,6 +96,10 @@ var FiscalCell = Backbone.Model.extend({
 			if (!_.isUndefined(response["FskMode"])) {
 				$this.set("isFiscalPrinter", true);
 			}
+			String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
+			if (response["model"].contains("ГНОМ")) {
+				window.isGNOME = true;
+			}
 			/**
 			 * Load last fiscalization report
 			 */
