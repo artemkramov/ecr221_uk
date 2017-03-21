@@ -5,6 +5,12 @@
             <td><%= t('Personalized with ID_SAM') %></td>
             <td><%= decHexStr(pers_sam_id) %></td>
         </tr>
+        <% if (!_.isUndefined(pers_time)) { %>
+            <tr>
+                <td><%= t("Personalization date") %></td>
+                <td><%= dateStr(pers_time) %></td>
+            </tr>
+        <% } %>
         <tr>
             <td><%= t('Modem state') %></td>
             <td><%= modemStateDecode(dev_state) %></td>
@@ -21,6 +27,12 @@
             <td><%= t('Block after') %></td>
             <td><%= afterTime(bt) %></td>
         </tr>
+        <% if (!_.isUndefined(ndoc)) { %>
+        <tr>
+            <td><%= t('Send documents count') %></td>
+            <td><%= ndoc %></td>
+        </tr>
+        <% } %>
     </table>
 
     <button class="btn btn-default" id="do_conn"><%= t('Exchange') %></button>

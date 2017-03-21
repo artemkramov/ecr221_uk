@@ -155,7 +155,9 @@
       "Checks": "Чеки",
       "Report": "Отчет",
       "FN": "ФН",
-      "Datetime": "Время"
+      "Datetime": "Время",
+      "Send documents count": "Количество непереданных пакетов",
+      "Personalization date": "Дата персонализации"
     }
   },
   "uk": {
@@ -314,7 +316,9 @@
       "Checks": "Чеки",
       "Report": "Звіт",
       "FN": "ФН",
-      "Datetime": "Час"
+      "Datetime": "Час",
+      "Send documents count": "Кількість непереданих пакетів",
+      "Personalization date": "Дата персоналізації"
     }
   }
 }
