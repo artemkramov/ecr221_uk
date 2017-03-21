@@ -9,7 +9,7 @@
  * Creates one elemView per collection item and insert it to appendEl
  */
 var CollectionView = Backbone.View.extend({
-	subViews:    [],
+	subViews:   [],
 	initialize: function (args) {
 		if (args && args.elemView) this.elemView = args.elemView;
 		this.initEl();
@@ -318,7 +318,7 @@ var PrgView = AddView.extend({
 
 var FiscalView = AddView.extend({
 	template: _.template($('#fiscal-cell').html()),
-	render:     function () {
+	render:   function () {
 		try {
 			this.$el.html(this.template(this.model.toJSON()));
 		} catch (e) {
@@ -723,8 +723,8 @@ var FormDisplay = Backbone.View.extend({
 			 * @type {number[]}
 			 */
 			var validateRows = [4, 5];
-			var fields = this.model.get('elems');
-			var pattern = "";
+			var fields       = this.model.get('elems');
+			var pattern      = "";
 			/**
 			 * Search for necessary field
 			 */
@@ -1163,10 +1163,12 @@ var LogoView = Backbone.View.extend({
 	},
 	loadECR:       function (e) {
 		e.preventDefault();
+		var self = this;
 		if (this.img.src != '/cgi/logo.bmp') {
 			this.clicked = $(e.target);
 			this.clicked.button('loading');
 			this.img.src = '/cgi/logo.bmp';
+
 		}
 		return false;
 	},
@@ -1185,6 +1187,9 @@ var LogoView = Backbone.View.extend({
 		var $this        = this;
 		reader.onload    = function (event) {
 			$this.img.src = event.target.result;
+			$this.imageInit().done(function () {
+				$this.render(true);
+			});
 		};
 		reader.readAsDataURL(selectedFile);
 		return false;
@@ -1343,19 +1348,36 @@ var LogoView = Backbone.View.extend({
 	},
 	initialize:    function () {
 		_.bindAll(this, 'render', 'imageInit', 'imageLoad', 'mdown', 'mup', 'mmove');
-		this.img.onload = this.imageInit;
+		var self        = this;
 		this.rendered   = false;
 		this.loaded     = false;
-		if (this.img.src.endsWith('/cgi/logo.bmp')) {
-			this.imageInit();
-		} else this.img.src = '/cgi/logo.bmp';
+		this.img.onload = function () {
+			self.imageInit().done(function () {
+				self.render(true);
+				console.log('render');
+			});
+		};
+		this.img.src    = '/cgi/logo.bmp';
+
+		//if (this.img.src.endsWith('/cgi/logo.bmp')) {
+		//	this.imageInit();
+		//} else this.img.src = '/cgi/logo.bmp';
+	},
+	initData:      function () {
+		var deferred = $.Deferred();
+		var self     = this;
+
+
+		return deferred.promise();
 	},
 	imageInit:     function () {
-		this.width      = this.img.width;
-		this.height     = this.img.height;
-		this.img.onload = this.imageLoad;
-		this.loaded     = true;
-		if (this.rendered) this.render();
+		var deferred = $.Deferred();
+		var self     = this;
+		this.width   = this.img.width;
+		this.height  = this.img.height;
+		self.imageLoad();
+		deferred.resolve();
+		return deferred.promise();
 	},
 	imageLoad:     function () {
 		this.imgX = 0;
@@ -1381,9 +1403,7 @@ var LogoView = Backbone.View.extend({
 		}
 		return ret;
 	},
-	render:        function () {
-		this.rendered = true;
-		if (!this.loaded) return this;
+	render:        function (toLoad) {
 		var root               = $('<div class="row"></div>');
 		this.$el.html("");
 		this.$el.append(root);
@@ -1392,10 +1412,13 @@ var LogoView = Backbone.View.extend({
 		this.context           = canvas[0].getContext('2d');
 		this.context.fillStyle = "white";
 		root.append($('<div class=" col-md-3"></div>').append(canvas));
-		this.imageLoad();
-		var tmpl               = ['<button type="button" id="', '" class="btn btn-', '" data-loading-text="',
+		this.initData();
+		if (!_.isUndefined(toLoad)) {
+			this.imageLoad();
+		}
+		var tmpl = ['<button type="button" id="', '" class="btn btn-', '" data-loading-text="',
 			'" data-toggle="tooltip" title="', '"><span class="glyphicon glyphicon-', '" aria-hidden="true"></span> ', '</button>'];
-		var cnt                = 0;
+		var cnt  = 0;
 		root.append(
 			_.reduce([
 					['ld', 'default', t('Wait...'), t('Load logo from ECR'), 'open', t('Load ECR')],
@@ -1414,7 +1437,7 @@ var LogoView = Backbone.View.extend({
 				}, ""
 			)
 		);
-		var inpf               = $('<input id="picFile" type="file"/>').css('display', "none");
+		var inpf = $('<input id="picFile" type="file"/>').css('display', "none");
 		root.append(inpf);
 		this.$el.append('<div class="row">' +
 			'<div class="col-md-12"><input id="edge" type="range" min="1" max="254" data-toggle="tooltip" title="' +
@@ -1423,6 +1446,7 @@ var LogoView = Backbone.View.extend({
 			'</span> ' + t('Back') + '</a>');
 		this.$('button').css("margin-top", '15px');
 		this.$('[data-toggle="tooltip"]').tooltip({placement: 'bottom'});
+
 		return this;
 	}
 });
