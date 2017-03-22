@@ -713,33 +713,6 @@ var FormDisplay = Backbone.View.extend({
 		});
 	},
 	setFormData:   function (obj, def) {
-		/**
-		 * Check if the table is Hdr
-		 * Then set the custom rules for appropriate lines
-		 */
-		if (this.model.get('id') == 'Hdr') {
-			/**
-			 * Rows with custom values
-			 * @type {number[]}
-			 */
-			var validateRows = [4, 5];
-			var fields       = this.model.get('elems');
-			var pattern      = "";
-			/**
-			 * Search for necessary field
-			 */
-			_.each(fields, function (field) {
-				if (field.name == "Line" && !_.isUndefined(field.pattern)) {
-					pattern = schema.regex(field.pattern);
-				}
-			});
-			if (validateRows.indexOf(this.data.get('id')) >= 0) {
-				pattern = '^.{0,15}$';
-			}
-			if (!_.isEmpty(pattern)) {
-				this.$el.find('[name=Line]').attr('pattern', pattern);
-			}
-		}
 		for (var name in obj) {
 			var val = obj[name];
 			//if (typeof (this.$el[0][name]) != "object") continue;
@@ -872,46 +845,6 @@ var TableDisplay = Backgrid.Grid.extend({
 			if (!args.columns) {
 				var col = args.model.get('elems');
 				if (this.selAll) col = [{name: "", cell: "select-row", headerCell: "select-all"}].concat(col);
-				/**
-				 * Temporary solution for the validation
-				 * of the special header lines
-				 */
-				if (args.model.id == "Hdr") {
-					_.each(col, function (column) {
-						/**
-						 * If the column name is Line then apply specific rules
-						 */
-						if (column.name == "Line") {
-							console.log('set formatter');
-							column.formatter = _.extend({}, Backgrid.CellFormatter.prototype, {
-								//fromRaw: function (rawValue, model) {
-								//	/**
-								//	 * Array of rows where the special validation must be applied
-								//	 * Length of the numbers less then 15
-								//	 * @type {number[]}
-								//	 */
-								//	var validateRows = [4, 5];
-								//	if (validateRows.indexOf(model.get('id')) >= 0 && !_.isEmpty(rawValue)) {
-								//		return rawValue.substr(0, 15);
-								//	}
-								//	return rawValue;
-								//},
-								toRaw: function (formattedValue, model) {
-									/**
-									 * Array of rows where the special validation must be applied
-									 * Length of the numbers less then 15
-									 * @type {number[]}
-									 */
-									var validateRows = [4, 5];
-									if (validateRows.indexOf(model.get('id')) >= 0 && !_.isEmpty(formattedValue)) {
-										return formattedValue.substr(0, 15);
-									}
-									return formattedValue;
-								}
-							});
-						}
-					});
-				}
 
 				this.columns = args.columns = col;
 			}
