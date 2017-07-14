@@ -157,7 +157,8 @@
       "FN": "ФН",
       "Datetime": "Время",
       "Send documents count": "Количество непереданных пакетов",
-      "Personalization date": "Дата персонализации"
+      "Personalization date": "Дата персонализации",
+      "Do you want to remove all items?": "Удалить все товары?"
     }
   },
   "uk": {
@@ -318,7 +319,8 @@
       "FN": "ФН",
       "Datetime": "Час",
       "Send documents count": "Кількість непереданих пакетів",
-      "Personalization date": "Дата персоналізації"
+      "Personalization date": "Дата персоналізації",
+      "Do you want to remove all items?": "Видалити всі товари?"
     }
   }
 }
