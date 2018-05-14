@@ -150,6 +150,18 @@
     </table>
 </script>
 
+<script type="text/template" id="indicator-status">
+    <div class="error-block"></div>
+    <div>
+        <% if (!_.isUndefined(message)) { %>
+        <div class="indicator-status-message">
+            <%= message %>
+        </div>
+        <% } %>
+
+    </div>
+</script>
+
 <script type="text/template" id="reports-tmpl">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -199,6 +211,8 @@
             </form>
         </div>
     </div>
+
+
 
     <% if (!window.isGNOME || (window.isGNOME && fiscalCell.get("isFiscalPrinter"))) { %>
     <div class="panel panel-default">

@@ -217,6 +217,10 @@ Name=img/modem-h.png
 File=img/modem-h.png
 Content-Type=image/png
 
+Name=img/indicator-h.png
+File=img/indicator-h.png
+Content-Type=image/png
+
 Name=img/on.svg
 File=img/on.svg
 Content-Type=image/svg+xml

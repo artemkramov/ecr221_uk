@@ -545,6 +545,11 @@ var NetworkInfo = Backbone.Collection.extend({
 	}
 });
 
+var IndicatorStatus = Backbone.Model.extend({
+	url:        '/cgi/scr',
+	defaults:   {"screen": [], "chars": [], "defaultMessage": "Connection lost"}
+});
+
 /*var salesCell = new Backbone.Model({zno:1,total:0.0,taxes:0.0,discounts:0.0,insafe:0.0});
  var receiptsCell = new Backbone.Model({receipts:0,returns:0,lrSum:0.0,lrNo:0.0,lrTime:0});*/
 /*    var sumRep = new Backbone.Model({

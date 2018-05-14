@@ -50,3 +50,16 @@ a img:active {-webkit-transform: scale(1);transform: scale(1);}
 .nav-stacked.static {
     position: static;
 }
+.indicator-status-message {
+    font-size: 35px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-family: Courier New;
+    letter-spacing: 2px;
+    font-weight: bold;
+    color: #FFF;
+    background: #3366FF;
+    padding: 5px 20px;
+    border: 10px solid #444;
+}

@@ -568,3 +568,107 @@ var ReportPage = Backbone.View.extend({
 		return false;
 	}
 });
+
+/**
+ * Indicator page
+ */
+var IndicatorPage = PageView.extend({
+	template:          _.template($('#indicator-status').html()),
+	timer:             undefined,
+	/**
+	 * Remove function
+	 */
+	remove:            function () {
+		clearInterval(this.timer);
+		PageView.prototype.remove.call(this);
+	},
+	/**
+	 * Initialize data
+	 */
+	initialize:        function () {
+		PageView.prototype.initialize.apply(this);
+		var self = this;
+		this.model.on('sync', this.render, this);
+		this.model.on('error', this.onErrorEvent, this);
+		//this.model.fetch();
+		var timerDuration = 300;
+		this.timer = setInterval(function () {
+			self.model.fetch({
+				timeout: timerDuration
+			});
+		}, timerDuration);
+	},
+	/**
+	 * Render container and data itself
+	 * @param isError
+	 * @returns {IndicatorPage}
+	 */
+	render:            function (isError) {
+		var self          = this;
+		this.delegateEvents();
+		var messages      = [];
+		var message;
+		var screen        = this.model.get('screen');
+		var chars         = this.model.get('chars');
+		if (!_.isEmpty(screen) && _.isArray(screen) && !_.isBoolean(isError) && !(isError === true)) {
+			_.each(screen, function (item) {
+				messages.push(item.str.replace(/ /g, '&#160;'));
+			});
+			message = messages.join("<br/>");
+		}
+		else {
+			message = t(this.model.get('defaultMessage'));
+		}
+		this.$el.html(this.template({
+			message: message
+		}));
+
+		return this;
+	},
+	/**
+	 * Show alert info message
+	 * @param message
+	 */
+	onInfoEvent:       function (message) {
+		this.pushMessage(message, "info");
+	},
+	/**
+	 * Show alert error message
+	 */
+	onErrorEvent:      function () {
+		this.render(true);
+	},
+	/**
+	 * Push alert message
+	 * @param message
+	 * @param type
+	 */
+	pushMessage:       function (message, type) {
+		var alert = new Alert({
+			model: {
+				type:    type,
+				message: message
+			}
+		});
+		this.clearMessageBlock().append(alert.render().$el);
+	},
+	/**
+	 * Clear error block
+	 * @returns {*}
+	 */
+	clearMessageBlock: function () {
+		return this.$el.find(".error-block").empty();
+	},
+	/**
+	 * Show preloader
+	 */
+	showPreloader:     function () {
+		$("body").addClass("preloading");
+	},
+	/**
+	 * Hide preloader
+	 */
+	hidePreloader:     function () {
+		$("body").removeClass("preloading");
+	}
+});

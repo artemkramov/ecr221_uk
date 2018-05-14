@@ -158,7 +158,10 @@
       "Datetime": "Время",
       "Send documents count": "Количество непереданных пакетов",
       "Personalization date": "Дата персонализации",
-      "Do you want to remove all items?": "Удалить все товары?"
+      "Do you want to remove all items?": "Удалить все товары?",
+      "Indicator": "Индикатор",
+      "Connection with indicator is lost": "Нет связи с индикатором",
+      "Connection lost": "Потеря<br/> соединения"
     }
   },
   "uk": {
@@ -320,7 +323,10 @@
       "Datetime": "Час",
       "Send documents count": "Кількість непереданих пакетів",
       "Personalization date": "Дата персоналізації",
-      "Do you want to remove all items?": "Видалити всі товари?"
+      "Do you want to remove all items?": "Видалити всі товари?",
+      "Indicator": "Індикатор",
+      "Connection with indicator is lost": "Немає зв'язку з індикатором",
+      "Connection lost": "Втрата<br/> з'єднання"
     }
   }
 }

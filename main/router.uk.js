@@ -14,7 +14,8 @@ var AppRouter = Backbone.Router.extend({
 		"fm(/:page)":      'fisc',
 		"logo":            'logoScr',
 		"report":          'repScr',
-		"backup":          'backupScr'
+		"backup":          'backupScr',
+		"indicator":       'indicatorScr'
 	},
 	execute: function (callback, args) {
 		if (this.view) {
@@ -42,7 +43,7 @@ var AppRouter = Backbone.Router.extend({
 	 },
 	 receiptScr: function() { tapeView.render(); },*/
 
-	pluScr:     function () {
+	pluScr:       function () {
 		this.view = new TableContainer({
 			model:   schema.get('PLU'),
 			tblMode: true,
@@ -51,17 +52,17 @@ var AppRouter = Backbone.Router.extend({
 			form:    PLUFormDisplay
 		});
 	},
-	repScr:     function () {
+	repScr:       function () {
 		this.view = new ReportPage();
 	},
-	logoScr:    function () {
+	logoScr:      function () {
 		this.view = new LogoView();
 	},
-	tableScr:   function () {
+	tableScr:     function () {
 		this.view = new GroupTable({group: 'cfg'});
 	},
-	networkTab: 0,
-	networkScr: function (page) {
+	networkTab:   0,
+	networkScr:   function (page) {
 		switch (page) {
 			case "state":
 				this.networkTab = 0;
@@ -73,9 +74,9 @@ var AppRouter = Backbone.Router.extend({
 		this.view = new PagesScreen({no: this.networkTab, models: networkPages});
 		//this.view = new GroupTable({group:'net'});
 	},
-	modemTab:   0,
-	fiscTab:    0,
-	modemScr:   function (page) {
+	modemTab:     0,
+	fiscTab:      0,
+	modemScr:     function (page) {
 		switch (page) {
 			case "state":
 				this.modemTab = 0;
@@ -89,7 +90,7 @@ var AppRouter = Backbone.Router.extend({
 		}
 		this.view = new PagesScreen({no: this.modemTab, models: modemPages});
 	},
-	fisc:       function (page) {
+	fisc:         function (page) {
 		switch (page) {
 			case "fisc":
 				this.fiscTab = 0;
@@ -103,16 +104,25 @@ var AppRouter = Backbone.Router.extend({
 		}
 		this.view = new PagesScreen({no: this.fiscTab, models: fiscalPages});
 	},
-	backupScr:  function (page) {
+	backupScr:    function (page) {
 		this.view = new BackupScreenView();
+	},
+	indicatorScr: function (page) {
+		var indicatorStatus = new IndicatorStatus();
+		var indicatorPages = [
+			{lnk: '#indicator/list', name: 'Indicator', page: new IndicatorPage({
+				model: indicatorStatus
+			})}
+		];
+		this.view          = new PagesScreen({models: indicatorPages, no: 0});
 	}
 });
 
 var appStart = function () {
 	window.isGNOME = false;
-	ecrStatus  = new ECRStatus();
-	modemState = new ModemStatus();
-	gprsExists = false;
+	ecrStatus      = new ECRStatus();
+	modemState     = new ModemStatus();
+	gprsExists     = false;
 	//var pluCell = new Backbone.Model({size:0});
 	fiscalCell  = new FiscalCell({
 		firstRep:        1,
@@ -159,7 +169,8 @@ var appStart = function () {
 		}),
 		new MainCell({model: new Backbone.Model({lnk: '#modem/state', img: 'modem', name: 'Modem'})}),
 		new MainCell({model: new Backbone.Model({lnk: '#report', img: 'sales', name: 'Reports'})}),
-		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})})
+		new MainCell({model: new Backbone.Model({lnk: '#backup', img: 'backup', name: 'Backup'})}),
+		new MainCell({model: new Backbone.Model({lnk: '#indicator', img: 'indicator', name: 'Indicator'})})
 	];
 	schema          = new Schema();
 	appRouter       = new AppRouter();
